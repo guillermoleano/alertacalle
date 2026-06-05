@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+
+<html class="light" lang="es-CO"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "on-secondary-fixed-variant": "#005048",
+                      "on-primary-fixed": "#00164e",
+                      "surface-container": "#eaedff",
+                      "primary-fixed": "#dce1ff",
+                      "surface-container-high": "#e2e7ff",
+                      "on-error": "#ffffff",
+                      "inverse-primary": "#b6c4ff",
+                      "on-surface": "#131b2e",
+                      "primary-fixed-dim": "#b6c4ff",
+                      "on-primary": "#ffffff",
+                      "on-tertiary-fixed-variant": "#653e00",
+                      "surface-container-low": "#f2f3ff",
+                      "on-secondary-fixed": "#00201c",
+                      "inverse-on-surface": "#eef0ff",
+                      "secondary-fixed": "#71f8e4",
+                      "secondary": "#006b5f",
+                      "on-tertiary": "#ffffff",
+                      "secondary-container": "#6df5e1",
+                      "tertiary-fixed-dim": "#ffb95f",
+                      "tertiary": "#3e2400",
+                      "on-surface-variant": "#444651",
+                      "background": "#faf8ff",
+                      "secondary-fixed-dim": "#4fdbc8",
+                      "outline-variant": "#c5c5d3",
+                      "surface-variant": "#dae2fd",
+                      "primary": "#00236f",
+                      "outline": "#757682",
+                      "tertiary-container": "#5c3800",
+                      "on-secondary": "#ffffff",
+                      "on-primary-fixed-variant": "#264191",
+                      "on-background": "#131b2e",
+                      "surface-bright": "#faf8ff",
+                      "surface-container-lowest": "#ffffff",
+                      "surface-dim": "#d2d9f4",
+                      "error-container": "#ffdad6",
+                      "tertiary-fixed": "#ffddb8",
+                      "on-secondary-container": "#006f64",
+                      "surface": "#faf8ff",
+                      "surface-container-highest": "#dae2fd",
+                      "on-tertiary-fixed": "#2a1700",
+                      "primary-container": "#1e3a8a",
+                      "inverse-surface": "#283044",
+                      "surface-tint": "#4059aa",
+                      "on-error-container": "#93000a",
+                      "on-primary-container": "#90a8ff",
+                      "on-tertiary-container": "#ef9900",
+                      "error": "#ba1a1a"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "xs": "4px",
+                      "base": "4px",
+                      "sm": "8px",
+                      "md": "12px",
+                      "xxl": "32px",
+                      "touch-target": "44px",
+                      "xl": "24px",
+                      "huge": "48px",
+                      "lg": "16px"
+              },
+              "fontFamily": {
+                      "display-mobile": ["Inter"],
+                      "h2": ["Inter"],
+                      "body": ["Inter"],
+                      "display": ["Inter"],
+                      "caption": ["Inter"],
+                      "h1": ["Inter"]
+              },
+              "fontSize": {
+                      "display-mobile": ["24px", {"lineHeight": "32px", "fontWeight": "700"}],
+                      "h2": ["18px", {"lineHeight": "24px", "fontWeight": "600"}],
+                      "body": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                      "display": ["28px", {"lineHeight": "36px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                      "caption": ["13px", {"lineHeight": "18px", "fontWeight": "500"}],
+                      "h1": ["22px", {"lineHeight": "28px", "fontWeight": "600"}]
+              }
+            },
+          },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .slide-transition {
+            transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .dot-active {
+            width: 24px;
+            background-color: #1e3a8a;
+        }
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body text-body selection:bg-primary-fixed antialiased overflow-hidden">
+<!-- Main Onboarding Container -->
+<main class="relative h-screen w-full flex flex-col justify-center items-center overflow-hidden">
+<!-- Header / Logo -->
+<div class="absolute top-huge left-0 right-0 flex justify-center z-10">
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-primary text-[32px]" data-icon="security">security</span>
+<span class="font-display text-display text-primary">AlertaCalle</span>
+</div>
+</div>
+<!-- Slides Wrapper -->
+<div class="flex slide-transition w-[300%] h-full" id="slider">
+<!-- Slide 1 -->
+<section class="w-screen h-full flex flex-col items-center justify-center px-lg text-center">
+<div class="max-w-[400px] space-y-huge">
+<div class="relative w-full aspect-square bg-surface-container-low rounded-full flex items-center justify-center overflow-hidden border border-outline-variant">
+<img alt="Reporte anónimo" class="w-4/5 h-4/5 object-contain" data-alt="A clean, minimalist 3D illustration of a smartphone displaying a shield icon, floating in a bright and serene environment. The scene uses a soft color palette of Trust Blue and white, conveying security and privacy. High-key studio lighting creates soft shadows and a professional, calm atmosphere for a safety application's onboarding flow." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBOcAaH4AerchqWxdPH63yROoRRaIFqQkDfxKNvcJ-bos9JQXksUxX5HmsjnW-1gZoO9vffX5oYpHDKDxJrgYmmc6qfR9P8Vsaqbd0crQPCHMwRMd2MysPlgZ1zZ_-bS1eRueheQOIwAvEPDqZzt5PLwiEetRDV8Ory9WNuR9oOtbb49bXRusC3rbNLmHK4ZG5Pc4QJ3C_bol-yOB7WZvWaIJwtkVgRU4z6wTTn4wFfuTEeH4OHw6krL3-cv08EgPUQP7tsx-xNnfY"/>
+</div>
+<div class="space-y-lg">
+<h1 class="font-display-mobile text-display-mobile text-on-surface">Reporta atracos en segundos y de forma anónima</h1>
+<p class="text-on-surface-variant px-md">Tu seguridad es nuestra prioridad. Comparte información vital sin comprometer tu identidad personal.</p>
+</div>
+</div>
+</section>
+<!-- Slide 2 -->
+<section class="w-screen h-full flex flex-col items-center justify-center px-lg text-center">
+<div class="max-w-[400px] space-y-huge">
+<div class="relative w-full aspect-square bg-surface-container-low rounded-full flex items-center justify-center overflow-hidden border border-outline-variant">
+<img alt="Mapa de riesgo" class="w-4/5 h-4/5 object-contain" data-alt="A sophisticated, minimalist map visualization showing glowing blue and teal pulse indicators over a simplified city layout. The aesthetic is modern corporate with clean lines and high whitespace, avoiding dark or alarming colors. The mood is analytical and calm, designed to help citizens understand urban safety trends at a glance." src="https://lh3.googleusercontent.com/aida-public/AB6AXuB2Y3Efa88_6tF6cRIZbhPLpwNhsK-qKAQ_7gqruuLD6U5NGaUSvPMh9vSvzywr4XxHb6QS4X52BkT1wLYqcpVZfyUxZcKwIm9DaSgojGCoujYj7lW8zeUPprmkYGjJn1SRVQTi8TQ6ndBPHWqdRQx0Sv_z9kaW_atRELnXItq7XIZQpfqjoODGM4Z0-VVQxnvojmN75OISGA-5xA9CA4ww_1GuiwIn455bEFrIcFzzB8U929X5LHoGwCOdWshib3OPEedgsaaCPlA"/>
+</div>
+<div class="space-y-lg">
+<h1 class="font-display-mobile text-display-mobile text-on-surface">Mira un mapa de riesgo en tiempo real de tu ciudad</h1>
+<p class="text-on-surface-variant px-md">Toma decisiones informadas sobre tus rutas diarias con datos actualizados por la comunidad.</p>
+</div>
+</div>
+</section>
+<!-- Slide 3 -->
+<section class="w-screen h-full flex flex-col items-center justify-center px-lg text-center">
+<div class="max-w-[400px] space-y-huge">
+<div class="relative w-full aspect-square bg-surface-container-low rounded-full flex items-center justify-center overflow-hidden border border-outline-variant">
+<img alt="Compromiso ético" class="w-4/5 h-4/5 object-contain" data-alt="A professional and trustworthy illustration of a digital document with a checkmark, surrounded by soft geometric shapes in Caribbean Teal and Trust Blue. The visual represents a legal and ethical agreement, emphasizing data protection and civic responsibility. The lighting is bright and airy, fostering a sense of community trust and institutional reliability." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBGz9_ez2-9YCXJ4M_jPvB8mUdjAMiSFUF7rvgoGOchLRZW2AuvwtNImtilO8aMHNyhG4A7XGbFMunpb1NzLGLu4UQFrNptFvvkO-filYT1qpKuAYNPD-jNxTdzeUnLrXpsaKN5hJo-SdDHA8ZrymCkudQSVMjVotwIrbhOZkfm_E5Xr7GLRNGYObHtHIWC2WEGes3c5c3SN2W08S0zuMLKF6_FYQAr5vx0O-AztwYnxk39Lu2IRPmnpaTRh9RZuJhjdXm87JntS-w"/>
+</div>
+<div class="space-y-lg">
+<h1 class="font-display-mobile text-display-mobile text-on-surface">Reportamos hechos en lugares, nunca acusamos personas</h1>
+<p class="text-on-surface-variant px-md">En AlertaCalle nos enfocamos en la prevención urbana bajo los principios de respeto y legalidad.</p>
+<!-- Legal Consent -->
+<div class="mt-xl p-lg bg-surface-container-highest rounded-xl text-left border border-outline-variant">
+<label class="flex items-start gap-md cursor-pointer group">
+<div class="relative flex items-center mt-1">
+<input class="peer h-5 w-5 rounded border-outline text-primary focus:ring-primary-container transition-all" id="consent-check" type="checkbox"/>
+</div>
+<span class="font-caption text-caption text-on-surface-variant leading-tight">
+                                    Acepto el tratamiento de datos personales bajo la Ley 1581 y los términos de uso centrados en la convivencia ciudadana.
+                                </span>
+</label>
+</div>
+</div>
+</div>
+</section>
+</div>
+<!-- Footer Navigation -->
+<div class="absolute bottom-huge left-0 right-0 px-xl flex flex-col items-center gap-huge">
+<!-- Pagination Dots -->
+<div class="flex gap-sm">
+<div class="h-2 w-2 rounded-full bg-outline-variant transition-all duration-300 dot-active" id="dot-0"></div>
+<div class="h-2 w-2 rounded-full bg-outline-variant transition-all duration-300" id="dot-1"></div>
+<div class="h-2 w-2 rounded-full bg-outline-variant transition-all duration-300" id="dot-2"></div>
+</div>
+<!-- Action Buttons -->
+<div class="w-full max-w-[400px] flex flex-col gap-md">
+<button class="h-touch-target w-full bg-primary text-on-primary font-h2 text-h2 rounded-xl shadow-sm hover:brightness-110 active:scale-[0.98] transition-all flex items-center justify-center gap-sm" id="next-btn">
+<span>Siguiente</span>
+<span class="material-symbols-outlined" data-icon="arrow_forward">arrow_forward</span>
+</button>
+<button class="hidden h-touch-target w-full bg-primary text-on-primary font-h2 text-h2 rounded-xl shadow-sm hover:brightness-110 active:scale-[0.98] transition-all opacity-50 cursor-not-allowed" disabled="" id="start-btn">
+                    Acepto y comienzo
+                </button>
+<button class="font-caption text-caption text-on-surface-variant hover:text-primary transition-colors py-sm" id="skip-btn">
+                    Saltar introducción
+                </button>
+</div>
+</div>
+</main>
+<script>
+        let currentSlide = 0;
+        const slider = document.getElementById('slider');
+        const dots = [
+            document.getElementById('dot-0'),
+            document.getElementById('dot-1'),
+            document.getElementById('dot-2')
+        ];
+        const nextBtn = document.getElementById('next-btn');
+        const startBtn = document.getElementById('start-btn');
+        const skipBtn = document.getElementById('skip-btn');
+        const consentCheck = document.getElementById('consent-check');
+
+        function updateSlide() {
+            slider.style.transform = `translateX(-${currentSlide * 100}vw)`;
+            
+            // Update dots
+            dots.forEach((dot, idx) => {
+                if(idx === currentSlide) {
+                    dot.classList.add('dot-active');
+                    dot.classList.remove('w-2');
+                } else {
+                    dot.classList.remove('dot-active');
+                    dot.classList.add('w-2');
+                }
+            });
+
+            // Update buttons visibility
+            if (currentSlide === 2) {
+                nextBtn.classList.add('hidden');
+                startBtn.classList.remove('hidden');
+                skipBtn.classList.add('invisible');
+            } else {
+                nextBtn.classList.remove('hidden');
+                startBtn.classList.add('hidden');
+                skipBtn.classList.remove('invisible');
+            }
+        }
+
+        nextBtn.addEventListener('click', () => {
+            if (currentSlide < 2) {
+                currentSlide++;
+                updateSlide();
+            }
+        });
+
+        skipBtn.addEventListener('click', () => {
+            currentSlide = 2;
+            updateSlide();
+        });
+
+        consentCheck.addEventListener('change', (e) => {
+            if (e.target.checked) {
+                startBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                startBtn.disabled = false;
+            } else {
+                startBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                startBtn.disabled = true;
+            }
+        });
+
+        startBtn.addEventListener('click', () => {
+            if (!startBtn.disabled) {
+                // Subtle feedback before navigation
+                startBtn.innerHTML = '<span class="material-symbols-outlined animate-spin" data-icon="progress_activity">progress_activity</span>';
+                setTimeout(() => {
+                    alert('Iniciando AlertaCalle...');
+                }, 800);
+            }
+        });
+
+        // Initialize
+        updateSlide();
+    </script>
+</body></html>

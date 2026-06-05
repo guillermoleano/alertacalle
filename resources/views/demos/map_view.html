@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+
+<html lang="es-CO"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                "on-secondary-fixed-variant": "#005048",
+                "on-primary-fixed": "#00164e",
+                "surface-container": "#eaedff",
+                "primary-fixed": "#dce1ff",
+                "surface-container-high": "#e2e7ff",
+                "on-error": "#ffffff",
+                "inverse-primary": "#b6c4ff",
+                "on-surface": "#131b2e",
+                "primary-fixed-dim": "#b6c4ff",
+                "on-primary": "#ffffff",
+                "on-tertiary-fixed-variant": "#653e00",
+                "surface-container-low": "#f2f3ff",
+                "on-secondary-fixed": "#00201c",
+                "inverse-on-surface": "#eef0ff",
+                "secondary-fixed": "#71f8e4",
+                "secondary": "#006b5f",
+                "on-tertiary": "#ffffff",
+                "secondary-container": "#6df5e1",
+                "tertiary-fixed-dim": "#ffb95f",
+                "tertiary": "#3e2400",
+                "on-surface-variant": "#444651",
+                "background": "#faf8ff",
+                "secondary-fixed-dim": "#4fdbc8",
+                "outline-variant": "#c5c5d3",
+                "surface-variant": "#dae2fd",
+                "primary": "#00236f",
+                "outline": "#757682",
+                "tertiary-container": "#5c3800",
+                "on-secondary": "#ffffff",
+                "on-primary-fixed-variant": "#264191",
+                "on-background": "#131b2e",
+                "surface-bright": "#faf8ff",
+                "surface-container-lowest": "#ffffff",
+                "surface-dim": "#d2d9f4",
+                "error-container": "#ffdad6",
+                "tertiary-fixed": "#ffddb8",
+                "on-secondary-container": "#006f64",
+                "surface": "#faf8ff",
+                "surface-container-highest": "#dae2fd",
+                "on-tertiary-fixed": "#2a1700",
+                "primary-container": "#1e3a8a",
+                "inverse-surface": "#283044",
+                "surface-tint": "#4059aa",
+                "on-error-container": "#93000a",
+                "on-primary-container": "#90a8ff",
+                "on-tertiary-container": "#ef9900",
+                "error": "#ba1a1a"
+            },
+            "borderRadius": {
+                "DEFAULT": "0.25rem",
+                "lg": "0.5rem",
+                "xl": "0.75rem",
+                "full": "9999px"
+            },
+            "spacing": {
+                "xs": "4px",
+                "base": "4px",
+                "sm": "8px",
+                "md": "12px",
+                "xxl": "32px",
+                "touch-target": "44px",
+                "xl": "24px",
+                "huge": "48px",
+                "lg": "16px"
+            },
+            "fontFamily": {
+                "display-mobile": ["Inter"],
+                "h2": ["Inter"],
+                "body": ["Inter"],
+                "display": ["Inter"],
+                "caption": ["Inter"],
+                "h1": ["Inter"]
+            },
+            "fontSize": {
+                "display-mobile": ["24px", {"lineHeight": "32px", "fontWeight": "700"}],
+                "h2": ["18px", {"lineHeight": "24px", "fontWeight": "600"}],
+                "body": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                "display": ["28px", {"lineHeight": "36px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                "caption": ["13px", {"lineHeight": "18px", "fontWeight": "500"}],
+                "h1": ["22px", {"lineHeight": "28px", "fontWeight": "600"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        .skeleton {
+            background: linear-gradient(90deg, #f0f3ff 25%, #e2e7ff 50%, #f0f3ff 75%);
+            background-size: 200% 100%;
+            animation: loading 1.5s infinite;
+        }
+        @keyframes loading {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body text-body antialiased">
+<!-- Desktop Side Navigation -->
+<aside class="w-[320px] h-screen fixed left-0 top-0 bg-surface border-r border-outline-variant shadow-sm z-40 flex flex-col p-lg hidden md:flex">
+<div class="mb-xxl">
+<h1 class="font-display text-display text-primary">AlertaCalle</h1>
+<p class="font-caption text-caption text-on-surface-variant">Seguridad Ciudadana</p>
+</div>
+<button class="bg-primary text-on-primary font-h2 text-h2 px-lg py-md rounded-xl flex items-center justify-center gap-sm mb-xl active:scale-95 transition-transform">
+<span class="material-symbols-outlined" data-icon="add_circle">add_circle</span>
+            Reportar
+        </button>
+<nav class="flex flex-col gap-xs mb-xl">
+<a class="text-primary font-bold border-r-4 border-primary bg-surface-container-high flex items-center gap-md p-md rounded-l-lg transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="map">map</span>
+                Mapa
+            </a>
+<a class="text-on-surface-variant hover:bg-surface-container-high flex items-center gap-md p-md rounded-lg transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="list_alt">list_alt</span>
+                Reportes
+            </a>
+<a class="text-on-surface-variant hover:bg-surface-container-high flex items-center gap-md p-md rounded-lg transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+                Ajustes
+            </a>
+</nav>
+<div class="mt-auto pt-lg border-t border-outline-variant">
+<div class="flex items-center gap-md">
+<img alt="User Profile" class="w-10 h-10 rounded-full object-cover" data-alt="A professional headshot of a friendly middle-aged man with short dark hair, wearing a clean white shirt. The background is a soft, out-of-focus urban environment in Bogota with morning light. The image has a warm, trustworthy tone with natural sunlight highlights." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDJ3j6XU7EIJIoW6u_B96vGKkyqbFEgIXwj0Ta5-LWwuAw6P6dpQJTrr0cl1siQTjCNL5qOn_LFgs612beSyMU37ib5mShZLpmeauHYZofP3bqQxLJSsMfBjifx54FptHdUF_hLk2mHw3LUhyBJkOs-lAEB3NL-G2N1vJej_yXI1w0iKOlO8S7pZuknz_TLBFZB35DmDi6fVGFmz6lp1rZd93SUsUAoAD6sWkp75Baz1dmPKE-wFvG-8_YtReq9D08eyw8HrKocNZc"/>
+<div>
+<p class="font-h2 text-caption text-on-surface">Carlos Mendoza</p>
+<p class="font-caption text-[11px] text-on-surface-variant">Verificado • Local Guide</p>
+</div>
+</div>
+</div>
+</aside>
+<!-- Top Navigation (Mobile/Desktop Hybrid) -->
+<header class="flex justify-between items-center px-lg md:px-xl py-md ml-0 md:ml-[320px] bg-surface/80 backdrop-blur-md sticky top-0 z-30">
+<div class="flex items-center gap-md flex-1">
+<div class="relative w-full max-w-md">
+<span class="material-symbols-outlined absolute left-md top-1/2 -translate-y-1/2 text-on-surface-variant" data-icon="search">search</span>
+<input class="w-full bg-surface-container-low border-none rounded-full py-sm pl-xl pr-md focus:ring-2 focus:ring-primary text-body font-body" placeholder="Buscar ubicación o reporte..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-lg ml-md">
+<button class="relative p-sm hover:bg-surface-container-high rounded-full transition-colors active:scale-90">
+<span class="material-symbols-outlined text-on-surface-variant" data-icon="notifications">notifications</span>
+<span class="absolute top-1 right-1 w-2 h-2 bg-error rounded-full"></span>
+</button>
+<button class="hidden md:flex items-center gap-sm px-md py-xs border border-outline-variant rounded-full hover:bg-surface-container-low transition-colors">
+<span class="material-symbols-outlined text-on-surface-variant" data-icon="account_circle">account_circle</span>
+<span class="font-caption text-on-surface">Mi Perfil</span>
+</button>
+</div>
+</header>
+<!-- Main Canvas Area -->
+<main class="ml-0 md:ml-[320px] h-[calc(100vh-64px)] md:h-[calc(100vh-72px)] relative flex flex-col md:flex-row overflow-hidden">
+<!-- Sidebar Content: Filters & Recent Reports (Desktop Left/Mobile Bottom Overlay) -->
+<div class="w-full md:w-[320px] h-full bg-surface border-r border-outline-variant overflow-y-auto hide-scrollbar z-20 flex flex-col">
+<!-- Filter Chips -->
+<div class="p-lg sticky top-0 bg-surface z-10 border-b border-outline-variant">
+<h3 class="font-h2 text-h2 mb-md text-on-surface">Filtros rápidos</h3>
+<div class="flex gap-sm overflow-x-auto hide-scrollbar pb-sm">
+<button class="px-md py-xs bg-secondary-container text-on-secondary-container rounded-full font-caption text-caption whitespace-nowrap">Últimas 24h</button>
+<button class="px-md py-xs bg-surface-container-low text-on-surface-variant border border-outline-variant rounded-full font-caption text-caption whitespace-nowrap hover:bg-surface-container-high transition-colors">7 días</button>
+<button class="px-md py-xs bg-surface-container-low text-on-surface-variant border border-outline-variant rounded-full font-caption text-caption whitespace-nowrap hover:bg-surface-container-high transition-colors">A pie</button>
+<button class="px-md py-xs bg-surface-container-low text-on-surface-variant border border-outline-variant rounded-full font-caption text-caption whitespace-nowrap hover:bg-surface-container-high transition-colors">En moto</button>
+</div>
+</div>
+<!-- Recent Reports List -->
+<div class="p-lg space-y-lg">
+<div class="flex justify-between items-center mb-sm">
+<h3 class="font-h2 text-h2 text-on-surface">Reportes recientes</h3>
+<button class="text-primary font-caption text-caption hover:underline">Ver todo</button>
+</div>
+<!-- Report Card 1 -->
+<div class="bg-white p-md rounded-xl shadow-sm border border-outline-variant hover:shadow-md transition-shadow cursor-pointer">
+<div class="flex justify-between items-start mb-sm">
+<div class="flex items-center gap-sm">
+<span class="w-2 h-2 rounded-full bg-error"></span>
+<span class="font-caption text-caption text-error uppercase tracking-wider">Riesgo Alto</span>
+</div>
+<span class="font-caption text-[11px] text-on-surface-variant">Hace 15 min</span>
+</div>
+<h4 class="font-h2 text-body text-on-surface mb-xs">Hurto de celular</h4>
+<p class="font-body text-caption text-on-surface-variant mb-md">Calle 100 con 15. Sujeto en moto negra portando arma blanca.</p>
+<div class="flex items-center gap-xs">
+<span class="material-symbols-outlined text-on-surface-variant text-[18px]" data-icon="location_on">location_on</span>
+<span class="font-caption text-[12px] text-on-surface-variant">Usaquén, Bogotá</span>
+</div>
+</div>
+<!-- Skeleton Loader State -->
+<div class="p-md rounded-xl border border-outline-variant bg-surface-container-lowest animate-pulse">
+<div class="flex justify-between items-center mb-sm">
+<div class="w-16 h-3 skeleton rounded"></div>
+<div class="w-12 h-3 skeleton rounded"></div>
+</div>
+<div class="w-3/4 h-4 skeleton rounded mb-md"></div>
+<div class="w-full h-3 skeleton rounded mb-xs"></div>
+<div class="w-1/2 h-3 skeleton rounded"></div>
+</div>
+<!-- Report Card 2 -->
+<div class="bg-white p-md rounded-xl shadow-sm border border-outline-variant hover:shadow-md transition-shadow cursor-pointer">
+<div class="flex justify-between items-start mb-sm">
+<div class="flex items-center gap-sm">
+<span class="w-2 h-2 rounded-full bg-tertiary-fixed-dim"></span>
+<span class="font-caption text-caption text-tertiary-container uppercase tracking-wider">Riesgo Medio</span>
+</div>
+<span class="font-caption text-[11px] text-on-surface-variant">Hace 2 horas</span>
+</div>
+<h4 class="font-h2 text-body text-on-surface mb-xs">Falla de luminaria</h4>
+<p class="font-body text-caption text-on-surface-variant mb-md">Parque de la 93. Zona muy oscura, facilita la inseguridad.</p>
+<div class="flex items-center gap-xs">
+<span class="material-symbols-outlined text-on-surface-variant text-[18px]" data-icon="location_on">location_on</span>
+<span class="font-caption text-[12px] text-on-surface-variant">Chapinero, Bogotá</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Interactive Map Content -->
+<div class="flex-1 relative bg-surface-container-low min-h-[400px]">
+<!-- Map Placeholder with Heatmap styling -->
+<div class="absolute inset-0 z-0 overflow-hidden bg-[#e5e7eb]">
+<img alt="Interactive Map of Bogota" class="w-full h-full object-cover opacity-60 grayscale-[0.3]" data-alt="A detailed, modern architectural map view of a metropolitan area in Colombia, showing street layouts and city blocks. Overlaid on the map are soft, translucent heat zones in shades of red, orange, and green, indicating safety levels. The aesthetic is clean, sophisticated, and data-driven, using a professional color palette of muted greys and vibrant risk indicators." data-location="Bogota, Colombia" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA4SPMnEgJN4MAWkNKcjCYAQ9v2bEsjhvhxR3-I8z9uoZ6TWZIg_RflM8bM2iKhexYENSLMvPSnk64BG18x-aSs4QwDKk2JBEqg7LJyu4fhRnQUF_tNy3TvdZmp31o6V_xwR_OHLFMbZUswI9X4t9pBhbY2HpnKt-_SZXxDViPAJY3t4wRyL8h49JXd-XRvy6d9Fr_AVHzlgxxlvLInzFKmjwaM0CEwohjRL9xIRsEkIBdOZz0_MPCk5WmpbuVsCUlLq9riS1Wp9yc"/>
+<!-- Custom Pins (Overlay) -->
+<div class="absolute top-[30%] left-[40%] cursor-pointer group">
+<div class="relative flex flex-col items-center">
+<div class="bg-error text-white p-xs rounded-full shadow-lg border-2 border-white group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-[18px]" data-icon="warning">warning</span>
+</div>
+<div class="mt-xs bg-white px-sm py-1 rounded shadow-sm opacity-0 group-hover:opacity-100 transition-opacity">
+<p class="text-[10px] font-bold whitespace-nowrap">Zona Crítica</p>
+</div>
+</div>
+</div>
+<div class="absolute bottom-[20%] right-[30%] cursor-pointer group">
+<div class="bg-secondary text-white p-xs rounded-full shadow-lg border-2 border-white group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-[18px]" data-icon="check_circle">check_circle</span>
+</div>
+</div>
+<!-- Heatmap Legend Overlay -->
+<div class="absolute bottom-xl right-xl bg-white/90 backdrop-blur-sm p-md rounded-xl shadow-lg border border-outline-variant z-10">
+<h5 class="font-h2 text-caption text-on-surface mb-sm">Nivel de Riesgo</h5>
+<div class="space-y-sm">
+<div class="flex items-center gap-md">
+<span class="w-3 h-3 rounded-full bg-error"></span>
+<span class="font-caption text-[12px] text-on-surface-variant">Alto (Reportes activos)</span>
+</div>
+<div class="flex items-center gap-md">
+<span class="w-3 h-3 rounded-full bg-[#ffb95f]"></span>
+<span class="font-caption text-[12px] text-on-surface-variant">Medio (Zonas oscuras)</span>
+</div>
+<div class="flex items-center gap-md">
+<span class="w-3 h-3 rounded-full bg-secondary"></span>
+<span class="font-caption text-[12px] text-on-surface-variant">Bajo (Vigilancia activa)</span>
+</div>
+</div>
+</div>
+<!-- Map Controls -->
+<div class="absolute top-xl right-xl flex flex-col gap-sm z-10">
+<button class="bg-white p-sm rounded-lg shadow-md border border-outline-variant hover:bg-surface-container-low active:scale-95 transition-all">
+<span class="material-symbols-outlined text-on-surface" data-icon="add">add</span>
+</button>
+<button class="bg-white p-sm rounded-lg shadow-md border border-outline-variant hover:bg-surface-container-low active:scale-95 transition-all">
+<span class="material-symbols-outlined text-on-surface" data-icon="remove">remove</span>
+</button>
+<button class="bg-primary text-on-primary p-sm rounded-lg shadow-md hover:opacity-90 active:scale-95 transition-all mt-md">
+<span class="material-symbols-outlined" data-icon="my_location">my_location</span>
+</button>
+</div>
+</div>
+</div>
+</main>
+<!-- Mobile Navigation Bar -->
+<nav class="fixed bottom-0 left-0 w-full flex justify-around items-center px-4 pb-safe h-[72px] md:hidden bg-surface border-t border-outline-variant backdrop-blur-md shadow-lg z-50">
+<div class="bg-secondary-container text-on-secondary-container rounded-2xl px-4 py-1 flex flex-col items-center justify-center">
+<span class="material-symbols-outlined" data-icon="map">map</span>
+<span class="font-caption text-caption">Mapa</span>
+</div>
+<div class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1">
+<span class="material-symbols-outlined" data-icon="assignment">assignment</span>
+<span class="font-caption text-caption">Reportes</span>
+</div>
+<div class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1">
+<span class="material-symbols-outlined" data-icon="person">person</span>
+<span class="font-caption text-caption">Perfil</span>
+</div>
+</nav>
+<script>
+        // Micro-interaction for report cards
+        document.querySelectorAll('.bg-white.p-md.rounded-xl').forEach(card => {
+            card.addEventListener('mouseenter', () => {
+                card.style.transform = 'translateY(-2px)';
+            });
+            card.addEventListener('mouseleave', () => {
+                card.style.transform = 'translateY(0)';
+            });
+        });
+
+        // Simple heatmap simulation interaction
+        const map = document.querySelector('main');
+        map.addEventListener('click', (e) => {
+            if (e.target.closest('button')) return;
+            console.log('Map focused at:', e.clientX, e.clientY);
+        });
+    </script>
+</body></html>

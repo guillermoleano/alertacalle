@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+
+<html lang="es-CO"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-secondary-fixed-variant": "#005048",
+                    "on-primary-fixed": "#00164e",
+                    "surface-container": "#eaedff",
+                    "primary-fixed": "#dce1ff",
+                    "surface-container-high": "#e2e7ff",
+                    "on-error": "#ffffff",
+                    "inverse-primary": "#b6c4ff",
+                    "on-surface": "#131b2e",
+                    "primary-fixed-dim": "#b6c4ff",
+                    "on-primary": "#ffffff",
+                    "on-tertiary-fixed-variant": "#653e00",
+                    "surface-container-low": "#f2f3ff",
+                    "on-secondary-fixed": "#00201c",
+                    "inverse-on-surface": "#eef0ff",
+                    "secondary-fixed": "#71f8e4",
+                    "secondary": "#006b5f",
+                    "on-tertiary": "#ffffff",
+                    "secondary-container": "#6df5e1",
+                    "tertiary-fixed-dim": "#ffb95f",
+                    "tertiary": "#3e2400",
+                    "on-surface-variant": "#444651",
+                    "background": "#faf8ff",
+                    "secondary-fixed-dim": "#4fdbc8",
+                    "outline-variant": "#c5c5d3",
+                    "surface-variant": "#dae2fd",
+                    "primary": "#00236f",
+                    "outline": "#757682",
+                    "tertiary-container": "#5c3800",
+                    "on-secondary": "#ffffff",
+                    "on-primary-fixed-variant": "#264191",
+                    "on-background": "#131b2e",
+                    "surface-bright": "#faf8ff",
+                    "surface-container-lowest": "#ffffff",
+                    "surface-dim": "#d2d9f4",
+                    "error-container": "#ffdad6",
+                    "tertiary-fixed": "#ffddb8",
+                    "on-secondary-container": "#006f64",
+                    "surface": "#faf8ff",
+                    "surface-container-highest": "#dae2fd",
+                    "on-tertiary-fixed": "#2a1700",
+                    "primary-container": "#1e3a8a",
+                    "inverse-surface": "#283044",
+                    "surface-tint": "#4059aa",
+                    "on-error-container": "#93000a",
+                    "on-primary-container": "#90a8ff",
+                    "on-tertiary-container": "#ef9900",
+                    "error": "#ba1a1a"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "xs": "4px",
+                    "base": "4px",
+                    "sm": "8px",
+                    "md": "12px",
+                    "xxl": "32px",
+                    "touch-target": "44px",
+                    "xl": "24px",
+                    "huge": "48px",
+                    "lg": "16px"
+            },
+            "fontFamily": {
+                    "display-mobile": ["Inter"],
+                    "h2": ["Inter"],
+                    "body": ["Inter"],
+                    "display": ["Inter"],
+                    "caption": ["Inter"],
+                    "h1": ["Inter"]
+            },
+            "fontSize": {
+                    "display-mobile": ["24px", {"lineHeight": "32px", "fontWeight": "700"}],
+                    "h2": ["18px", {"lineHeight": "24px", "fontWeight": "600"}],
+                    "body": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "display": ["28px", {"lineHeight": "36px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "caption": ["13px", {"lineHeight": "18px", "fontWeight": "500"}],
+                    "h1": ["22px", {"lineHeight": "28px", "fontWeight": "600"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>.material-symbols-outlined {
+    font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24
+    }
+body {
+    background-color: #F8FAFC
+    }
+.map-bg {
+    background-image: url(https://lh3.googleusercontent.com/aida-public/AB6AXuCmtb9knZbUcg1WuXQXDrOULEBSecosQqpm1K5TqCY0wCu2NYSlJXphKM3OSjUsPQa7iDzgwPtHUpMTP6aXV4oF33wN1sNBqJuSi6ez7tyOW1s6N7vyg4UwDHqo9OU6PgPNnr5YkqVX3kkTJjzGoT9XhfwyXn08UhEcwG37X64h6NrzoYfrCf3vRYy4Hl7yrLmAhCrxyF29xDmrCGCMhJI3VJ8l6v-8H3DmhaUx3WeBNMl1Cfcug2O5rts6pqb_KiPcLQtcxCZWask);
+    background-size: cover;
+    background-position: center;
+    filter: grayscale(20%) brightness(1.05)
+    }
+.glass-panel {
+    backdrop-filter: blur(8px);
+    background-color: rgba(255, 255, 255, 0.9)
+    }</style>
+</head>
+<body class="font-body text-body text-on-surface m-0 p-0 overflow-hidden">
+<!-- Desktop SideNav -->
+<aside class="w-[320px] h-screen fixed left-0 top-0 bg-surface border-r border-outline-variant shadow-sm flex flex-col p-lg hidden md:flex z-40">
+<div class="mb-huge">
+<h1 class="font-display text-display text-primary">AlertaCalle</h1>
+<p class="font-caption text-caption text-on-surface-variant">Seguridad Ciudadana</p>
+</div>
+<nav class="flex flex-col gap-sm flex-1">
+<a class="flex items-center gap-md p-md text-primary font-bold border-r-4 border-primary transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="map">map</span>
+<span class="font-body text-body">Mapa</span>
+</a>
+<a class="flex items-center gap-md p-md text-on-surface-variant hover:bg-surface-container-high transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="list_alt">list_alt</span>
+<span class="font-body text-body">Reportes</span>
+</a>
+<a class="flex items-center gap-md p-md text-on-surface-variant hover:bg-surface-container-high transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span class="font-body text-body">Ajustes</span>
+</a>
+</nav>
+<button class="mt-auto bg-primary text-on-primary py-lg rounded-xl font-h2 text-h2 transition-transform active:scale-95 shadow-md">
+            Reportar
+        </button>
+</aside>
+<!-- TopNavBar (Desktop only) -->
+<header class="flex justify-between items-center px-xl py-md ml-[320px] hidden md:flex bg-surface border-b border-outline-variant fixed top-0 left-0 right-0 z-30">
+<div class="flex items-center gap-xl">
+<span class="font-h1 text-h1 text-primary">Detalle del Reporte</span>
+</div>
+<div class="flex items-center gap-xl">
+<div class="flex gap-lg">
+<a class="text-on-surface-variant hover:text-primary font-caption text-caption transition-colors" href="#">Mi Perfil</a>
+<a class="text-on-surface-variant hover:text-primary font-caption text-caption transition-colors" href="#">Ayuda</a>
+</div>
+<div class="flex gap-md">
+<span class="material-symbols-outlined cursor-pointer text-on-surface-variant" data-icon="notifications">notifications</span>
+<span class="material-symbols-outlined cursor-pointer text-on-surface-variant" data-icon="account_circle">account_circle</span>
+</div>
+</div>
+</header>
+<!-- Map Canvas (Background) -->
+<main class="md:ml-[320px] h-screen w-full map-bg relative flex items-center justify-center" data-alt="A detailed digital map view of a modern urban city with subtle blue and grey tones, featuring clean streets and green park areas. The map uses a reduced saturation style typical of a professional safety application. Small, glowing red and orange circular pins are strategically placed at street intersections, representing active reports. The lighting is bright and clear, evoking a trustworthy and serene atmosphere for a civic navigation interface." data-location="Barranquilla, Colombia" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBH7fti8IMLWhO_fRsqjn1eB5wlhdNrw7ZsCRT9cDJPWlsf2SaZpPL8skfo1PHNAxAidi4K0P70EwPPnt9A_xUrLUGoTivTzdlwxBfONXVyQdSAR7GJzQdZgROD031QemgXat7jO2ud-uc7CSszOwZEwul7WiV617bfrDN_-FDLQvQ7crJIvfxRwW7Hc2k2fxAVd9TtBexIiNd2MWLN5VMmYJea3Wm3H47AjuDFAW548yx966mwqXdzcuIImszDRR2pufLw5BQn_Yc')">
+<!-- Subtle Overlay for contrast -->
+<div class="absolute inset-0 bg-on-surface/5 pointer-events-none"></div>
+<!-- Detail Card (The Focus) -->
+<section class="relative z-20 w-full max-w-[440px] px-lg md:px-0">
+<div class="bg-surface rounded-xl shadow-lg border border-outline-variant overflow-hidden animate-in fade-in zoom-in duration-300">
+<!-- Card Header -->
+<div class="p-lg border-b border-outline-variant flex justify-between items-start">
+<div class="flex gap-lg">
+<div class="w-huge h-huge rounded-full bg-error-container flex items-center justify-center">
+<span class="material-symbols-outlined text-on-error-container" data-icon="warning" style="font-variation-settings: 'FILL' 1;">warning</span>
+</div>
+<div>
+<h2 class="font-h2 text-h2 text-on-surface">Hurto en proceso</h2>
+<p class="font-caption text-caption text-on-surface-variant">hace 20 min</p>
+</div>
+</div>
+<button class="w-touch-target h-touch-target flex items-center justify-center text-on-surface-variant hover:bg-surface-container rounded-full transition-colors">
+<span class="material-symbols-outlined" data-icon="close">close</span>
+</button>
+</div>
+<!-- Card Body -->
+<div class="p-lg space-y-lg">
+<!-- Confidence Badge -->
+<div class="flex items-center gap-sm">
+<span class="font-caption text-caption text-on-surface-variant">Nivel de confianza:</span>
+<div class="flex items-center gap-xs px-md py-1 bg-secondary-container text-on-secondary-container rounded-full border border-secondary/20">
+<span class="w-2 h-2 rounded-full bg-secondary"></span>
+<span class="font-caption text-caption font-bold">Alto</span>
+</div>
+</div>
+<!-- Location -->
+<div class="flex items-start gap-md bg-surface-container-low p-md rounded-lg">
+<span class="material-symbols-outlined text-primary" data-icon="location_on">location_on</span>
+<div class="flex-1">
+<p class="font-caption text-caption text-on-surface-variant">Ubicación aproximada</p>
+<p class="font-body text-body font-medium">Cerca de Calle 72 con Cra 53</p>
+</div>
+</div>
+<!-- Action Buttons -->
+<div class="grid grid-cols-2 gap-lg pt-sm">
+<button class="flex flex-col items-center justify-center gap-xs bg-primary text-on-primary p-lg rounded-xl transition-all active:scale-95 hover:bg-primary-container shadow-sm group">
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-on-primary-container" data-icon="thumb_up" style="font-variation-settings: 'FILL' 1;">thumb_up</span>
+<span class="font-h2 text-h2">Confirmar</span>
+</div>
+<span class="font-caption text-caption opacity-80">14 confirmaciones</span>
+</button>
+<button class="flex flex-col items-center justify-center gap-xs bg-surface border border-outline-variant text-on-surface-variant p-lg rounded-xl transition-all active:scale-95 hover:bg-surface-container-low group">
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined" data-icon="thumb_down">thumb_down</span>
+<span class="font-h2 text-h2">Desmentir</span>
+</div>
+<span class="font-caption text-caption text-on-surface-variant">2 desmentidos</span>
+</button>
+</div>
+<!-- Footer Link -->
+<div class="pt-sm text-center">
+<a class="font-caption text-caption text-outline hover:text-error transition-colors underline underline-offset-4" href="#">
+                            Reportar como falso
+                        </a>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- BottomNavBar (Mobile only) -->
+<nav class="fixed bottom-0 left-0 w-full flex justify-around items-center px-4 pb-safe h-[72px] md:hidden bg-surface/90 backdrop-blur-md border-t border-outline-variant z-50 shadow-lg">
+<a class="flex flex-col items-center justify-center bg-secondary-container text-on-secondary-container rounded-2xl px-4 py-1" href="#">
+<span class="material-symbols-outlined" data-icon="map" style="font-variation-settings: 'FILL' 1;">map</span>
+<span class="font-caption text-caption">Mapa</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1 hover:bg-surface-container-low transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="assignment">assignment</span>
+<span class="font-caption text-caption">Mis reportes</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1 hover:bg-surface-container-low transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="person">person</span>
+<span class="font-caption text-caption">Perfil</span>
+</a>
+</nav>
+<script>
+        // Simple micro-interaction for confirmation count
+        const confirmBtn = document.querySelector('.bg-primary');
+        let count = 14;
+        confirmBtn.addEventListener('click', () => {
+            count++;
+            const countText = confirmBtn.querySelector('.font-caption');
+            countText.textContent = `${count} confirmaciones`;
+            confirmBtn.classList.add('scale-95');
+            setTimeout(() => confirmBtn.classList.remove('scale-95'), 100);
+        });
+    </script>
+</body></html>

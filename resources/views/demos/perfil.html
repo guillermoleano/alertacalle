@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+
+<html lang="es-CO"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-secondary-fixed-variant": "#005048",
+                        "on-primary-fixed": "#00164e",
+                        "surface-container": "#eaedff",
+                        "primary-fixed": "#dce1ff",
+                        "surface-container-high": "#e2e7ff",
+                        "on-error": "#ffffff",
+                        "inverse-primary": "#b6c4ff",
+                        "on-surface": "#131b2e",
+                        "primary-fixed-dim": "#b6c4ff",
+                        "on-primary": "#ffffff",
+                        "on-tertiary-fixed-variant": "#653e00",
+                        "surface-container-low": "#f2f3ff",
+                        "on-secondary-fixed": "#00201c",
+                        "inverse-on-surface": "#eef0ff",
+                        "secondary-fixed": "#71f8e4",
+                        "secondary": "#006b5f",
+                        "on-tertiary": "#ffffff",
+                        "secondary-container": "#6df5e1",
+                        "tertiary-fixed-dim": "#ffb95f",
+                        "tertiary": "#3e2400",
+                        "on-surface-variant": "#444651",
+                        "background": "#faf8ff",
+                        "secondary-fixed-dim": "#4fdbc8",
+                        "outline-variant": "#c5c5d3",
+                        "surface-variant": "#dae2fd",
+                        "primary": "#00236f",
+                        "outline": "#757682",
+                        "tertiary-container": "#5c3800",
+                        "on-secondary": "#ffffff",
+                        "on-primary-fixed-variant": "#264191",
+                        "on-background": "#131b2e",
+                        "surface-bright": "#faf8ff",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-dim": "#d2d9f4",
+                        "error-container": "#ffdad6",
+                        "tertiary-fixed": "#ffddb8",
+                        "on-secondary-container": "#006f64",
+                        "surface": "#faf8ff",
+                        "surface-container-highest": "#dae2fd",
+                        "on-tertiary-fixed": "#2a1700",
+                        "primary-container": "#1e3a8a",
+                        "inverse-surface": "#283044",
+                        "surface-tint": "#4059aa",
+                        "on-error-container": "#93000a",
+                        "on-primary-container": "#90a8ff",
+                        "on-tertiary-container": "#ef9900",
+                        "error": "#ba1a1a"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "xs": "4px",
+                        "base": "4px",
+                        "sm": "8px",
+                        "md": "12px",
+                        "xxl": "32px",
+                        "touch-target": "44px",
+                        "xl": "24px",
+                        "huge": "48px",
+                        "lg": "16px"
+                    },
+                    "fontFamily": {
+                        "display-mobile": ["Inter"],
+                        "h2": ["Inter"],
+                        "body": ["Inter"],
+                        "display": ["Inter"],
+                        "caption": ["Inter"],
+                        "h1": ["Inter"]
+                    },
+                    "fontSize": {
+                        "display-mobile": ["24px", {"lineHeight": "32px", "fontWeight": "700"}],
+                        "h2": ["18px", {"lineHeight": "24px", "fontWeight": "600"}],
+                        "body": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "display": ["28px", {"lineHeight": "36px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "caption": ["13px", {"lineHeight": "18px", "fontWeight": "500"}],
+                        "h1": ["22px", {"lineHeight": "28px", "fontWeight": "600"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body { background-color: #F8FAFC; }
+    </style>
+</head>
+<body class="font-body text-on-surface antialiased">
+<!-- Desktop Side Navigation -->
+<aside class="w-[320px] h-screen fixed left-0 top-0 bg-surface border-r border-outline-variant shadow-sm flex flex-col p-lg hidden md:flex z-40">
+<div class="mb-xxl">
+<h1 class="font-display text-display text-primary">AlertaCalle</h1>
+<p class="font-caption text-caption text-on-surface-variant">Seguridad Ciudadana</p>
+</div>
+<nav class="flex-1 space-y-sm">
+<a class="flex items-center gap-md p-md rounded-xl text-on-surface-variant hover:bg-surface-container-high transition-colors active:scale-95" href="#">
+<span class="material-symbols-outlined">map</span>
+<span class="font-body text-body">Mapa</span>
+</a>
+<a class="flex items-center gap-md p-md rounded-xl text-on-surface-variant hover:bg-surface-container-high transition-colors active:scale-95" href="#">
+<span class="material-symbols-outlined">list_alt</span>
+<span class="font-body text-body">Reportes</span>
+</a>
+<a class="flex items-center gap-md p-md rounded-xl text-on-surface-variant hover:bg-surface-container-high transition-colors active:scale-95" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-body text-body">Ajustes</span>
+</a>
+<!-- Perfil is Active -->
+<a class="flex items-center gap-md p-md rounded-xl text-primary font-bold border-r-4 border-primary bg-surface-container-low transition-colors" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">person</span>
+<span class="font-body text-body">Mi Perfil</span>
+</a>
+</nav>
+<div class="mt-auto p-md bg-surface-container-lowest rounded-xl flex items-center gap-md">
+<img alt="User" class="w-10 h-10 rounded-full object-cover" data-alt="A professional headshot of a smiling Colombian man in his mid-30s with short dark hair and a neat beard. He is wearing a clean, casual linen shirt. The background is a soft, out-of-focus urban park in Bogota during a bright, sunny afternoon, reflecting a trustworthy and community-oriented persona." src="https://lh3.googleusercontent.com/aida-public/AB6AXuC_bIlNe6isOagqF2EmAo9dndMD06M_yxg2aBRoUmxdj2iFArVi5YQ2-nSHgAFvAQxBPWCjk3Tcn_YHhrKYRd0ecVV3p9He-UZt8-WkyJvE08PRO8N248ub3JrEWXlP8LFgtS0zgBPXzcZKhWly-ABkn1n4-QIfdVaO-WQNycAzPOSBJWqv4EDlVULU0HHXk1sdqwRth4Hl7nXxrU20waDt-DexUA8sHVVXPxlcm6pRsTyWZo0wccEWKSwiHEW34hxLic3Tv3qp_GE"/>
+<div>
+<p class="font-body text-body font-bold">Carlos Mendoza</p>
+<p class="font-caption text-caption text-on-surface-variant">Ciudadano Activo</p>
+</div>
+</div>
+</aside>
+<!-- Top Bar for Web -->
+<header class="flex justify-between items-center px-xl py-md ml-[320px] hidden md:flex bg-surface border-b border-outline-variant">
+<h2 class="font-h1 text-h1 text-primary">Mi Perfil</h2>
+<div class="flex items-center gap-xl">
+<div class="flex gap-lg">
+<span class="font-body text-body text-on-surface-variant cursor-pointer hover:text-primary transition-colors">Ayuda</span>
+</div>
+<div class="flex gap-md">
+<span class="material-symbols-outlined text-on-surface-variant cursor-pointer active:opacity-80">notifications</span>
+<span class="material-symbols-outlined text-primary cursor-pointer active:opacity-80" style="font-variation-settings: 'FILL' 1;">account_circle</span>
+</div>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="md:ml-[320px] p-lg md:p-xxl pb-[100px] md:pb-xxl">
+<!-- Mobile Header -->
+<div class="md:hidden mb-lg">
+<h2 class="font-display-mobile text-display-mobile text-primary">Mi Perfil</h2>
+</div>
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-xl">
+<!-- Left Column: User Info & Reputation -->
+<div class="lg:col-span-5 space-y-xl">
+<!-- Profile Card -->
+<section class="bg-white p-xl rounded-xl shadow-[0px_4px_12px_rgba(15,23,42,0.05)] border border-outline-variant">
+<div class="flex flex-col items-center text-center mb-lg">
+<div class="relative mb-md">
+<img alt="Profile Large" class="w-24 h-24 rounded-full object-cover border-4 border-primary-container shadow-md" data-alt="A high-quality close-up portrait of a friendly man with a warm smile, set against a bright, minimalist studio background with soft blue tones. He represents a reliable community leader. The lighting is clean and professional, emphasizing trust and clarity in a modern digital environment." src="https://lh3.googleusercontent.com/aida-public/AB6AXuB5bfQY_qFbI8zH3eTJcsAmMQyRIzZ0ksvImnMbOi8I0Ab0gc5pYERQvIPVR-q_Cy1tRdSQRF58TWSfkZfLsWscLgMFFl316K3BhxExhNu9aZsIajU4b6Ri8z1MqJ0eJyjFVqDWh6c5D97U3ujFPFp7axW12nbCHQmpxFnHGdxcAepnUSbFJACUOFfcNuYumPGkRoHsxtAG8KDcy0Xk7OAnEVBnJ_aOw0oebUzS7xV84fCBjXkFClbx6cI8TOPNZ5wmEEfra-MyciA"/>
+<div class="absolute bottom-0 right-0 bg-secondary-container text-on-secondary-container p-1 rounded-full shadow-md">
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">verified</span>
+</div>
+</div>
+<h3 class="font-h1 text-h1 text-on-surface">Carlos Mendoza</h3>
+<p class="font-body text-body text-on-surface-variant">Bogotá, Colombia</p>
+</div>
+<div class="space-y-md">
+<div>
+<div class="flex justify-between items-end mb-xs">
+<label class="font-caption text-caption text-on-surface-variant">Reputación de Ciudadano</label>
+<span class="font-body text-body font-bold text-secondary">850 / 1000</span>
+</div>
+<div class="w-full bg-surface-container rounded-full h-3">
+<div class="bg-secondary h-3 rounded-full transition-all duration-1000" style="width: 85%"></div>
+</div>
+<p class="font-caption text-caption text-on-surface-variant mt-sm">
+                                Tu reputación es <strong>Excelente</strong>. Tus reportes son precisos y ayudan a mantener la comunidad segura.
+                            </p>
+</div>
+<button class="w-full flex items-center justify-center gap-md py-md bg-primary text-on-primary rounded-xl font-bold transition-all active:scale-95 shadow-md">
+<span class="material-symbols-outlined">smartphone</span>
+                            Verificar mi teléfono
+                        </button>
+</div>
+</section>
+<!-- Identity Verification Prompt -->
+<section class="bg-primary-container/10 p-lg rounded-xl border border-primary-container/20">
+<div class="flex gap-md">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">info</span>
+<div>
+<p class="font-body text-body font-bold text-primary">Aumenta tu impacto</p>
+<p class="font-caption text-caption text-on-primary-fixed-variant mt-1">Verificar tu identidad otorga mayor prioridad a tus reportes en el mapa ciudadano.</p>
+</div>
+</div>
+</section>
+</div>
+<!-- Right Column: My Reports -->
+<div class="lg:col-span-7 space-y-lg">
+<div class="flex items-center justify-between">
+<h3 class="font-h2 text-h2 text-on-surface">Mis reportes recientes</h3>
+<span class="font-caption text-caption text-primary cursor-pointer hover:underline">Ver todo</span>
+</div>
+<div class="space-y-md">
+<!-- Report Card 1 -->
+<div class="bg-white p-lg rounded-xl shadow-[0px_4px_12px_rgba(15,23,42,0.05)] border border-outline-variant flex gap-lg items-start transition-transform hover:translate-y-[-2px]">
+<div class="bg-error-container/20 p-md rounded-lg">
+<span class="material-symbols-outlined text-error" style="font-variation-settings: 'FILL' 1;">lightbulb_circle</span>
+</div>
+<div class="flex-1">
+<div class="flex justify-between items-start">
+<h4 class="font-body text-body font-bold">Falla de Alumbrado Público</h4>
+<span class="bg-secondary-container text-on-secondary-container px-sm py-xs rounded-full font-caption text-[11px] font-bold uppercase tracking-wider">Activo</span>
+</div>
+<p class="font-caption text-caption text-on-surface-variant">Calle 72 #13-54, Chapinero</p>
+<div class="flex items-center gap-sm mt-md">
+<span class="material-symbols-outlined text-[16px] text-outline">calendar_today</span>
+<span class="font-caption text-caption text-outline">24 Oct, 2023</span>
+</div>
+</div>
+</div>
+<!-- Report Card 2 -->
+<div class="bg-white p-lg rounded-xl shadow-[0px_4px_12px_rgba(15,23,42,0.05)] border border-outline-variant flex gap-lg items-start transition-transform hover:translate-y-[-2px]">
+<div class="bg-tertiary-fixed-dim/20 p-md rounded-lg">
+<span class="material-symbols-outlined text-tertiary-container" style="font-variation-settings: 'FILL' 1;">warning</span>
+</div>
+<div class="flex-1">
+<div class="flex justify-between items-start">
+<h4 class="font-body text-body font-bold">Escombro Obstruyendo Vía</h4>
+<span class="bg-surface-container-highest text-on-surface-variant px-sm py-xs rounded-full font-caption text-[11px] font-bold uppercase tracking-wider">Vencido</span>
+</div>
+<p class="font-caption text-caption text-on-surface-variant">Carrera 15 con Calle 94</p>
+<div class="flex items-center gap-sm mt-md">
+<span class="material-symbols-outlined text-[16px] text-outline">calendar_today</span>
+<span class="font-caption text-caption text-outline">12 Sep, 2023</span>
+</div>
+</div>
+</div>
+<!-- Report Card 3 -->
+<div class="bg-white p-lg rounded-xl shadow-[0px_4px_12px_rgba(15,23,42,0.05)] border border-outline-variant flex gap-lg items-start transition-transform hover:translate-y-[-2px]">
+<div class="bg-secondary-container/20 p-md rounded-lg">
+<span class="material-symbols-outlined text-secondary" style="font-variation-settings: 'FILL' 1;">security</span>
+</div>
+<div class="flex-1">
+<div class="flex justify-between items-start">
+<h4 class="font-body text-body font-bold">Presencia de Ventas Ilegales</h4>
+<span class="bg-surface-container-highest text-on-surface-variant px-sm py-xs rounded-full font-caption text-[11px] font-bold uppercase tracking-wider">Vencido</span>
+</div>
+<p class="font-caption text-caption text-on-surface-variant">Parque de la 93</p>
+<div class="flex items-center gap-sm mt-md">
+<span class="material-symbols-outlined text-[16px] text-outline">calendar_today</span>
+<span class="font-caption text-caption text-outline">05 Ago, 2023</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Privacy Section -->
+<section class="mt-huge pt-xxl border-t border-outline-variant">
+<div class="max-w-3xl">
+<h3 class="font-h2 text-h2 text-on-surface mb-md">Privacidad y Seguridad</h3>
+<p class="font-body text-body text-on-surface-variant mb-xl leading-relaxed">
+                    En AlertaCalle, tu seguridad es nuestra prioridad. Tus datos personales están encriptados y solo se utilizan para validar la autenticidad de los reportes. Puedes consultar nuestro <a class="text-primary font-bold hover:underline" href="#">Aviso de Privacidad</a> completo para más detalles.
+                </p>
+<div class="flex flex-col sm:flex-row gap-lg">
+<button class="flex items-center justify-center gap-md px-xl py-md border border-outline text-on-surface font-bold rounded-xl hover:bg-surface-container-low transition-colors active:scale-95">
+<span class="material-symbols-outlined">policy</span>
+                        Ver Aviso de Privacidad
+                    </button>
+<button class="flex items-center justify-center gap-md px-xl py-md text-error font-bold rounded-xl hover:bg-error-container/10 transition-colors active:scale-95">
+<span class="material-symbols-outlined">delete_forever</span>
+                        Borrar mis datos
+                    </button>
+</div>
+<p class="font-caption text-caption text-outline mt-lg italic">
+                    Nota: Borrar tus datos eliminará permanentemente tu historial de reportes y tu reputación acumulada.
+                </p>
+</div>
+</section>
+</main>
+<!-- Bottom Navigation for Mobile -->
+<nav class="fixed bottom-0 left-0 w-full flex justify-around items-center px-4 pb-safe h-[72px] md:hidden bg-surface/90 backdrop-blur-md border-t border-outline-variant z-50">
+<a class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1 active:scale-90 transition-all duration-200" href="#">
+<span class="material-symbols-outlined">map</span>
+<span class="font-caption text-caption">Mapa</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1 active:scale-90 transition-all duration-200" href="#">
+<span class="material-symbols-outlined">assignment</span>
+<span class="font-caption text-caption">Mis reportes</span>
+</a>
+<!-- Perfil is active -->
+<a class="flex flex-col items-center justify-center bg-secondary-container text-on-secondary-container rounded-2xl px-4 py-1 active:scale-90 transition-all duration-200" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">person</span>
+<span class="font-caption text-caption">Perfil</span>
+</a>
+</nav>
+<script>
+        // Micro-interaction for hover effects on cards
+        const cards = document.querySelectorAll('.bg-white');
+        cards.forEach(card => {
+            card.addEventListener('mouseenter', () => {
+                card.style.boxShadow = '0px 10px 20px rgba(15, 23, 42, 0.08)';
+            });
+            card.addEventListener('mouseleave', () => {
+                card.style.boxShadow = '0px 4px 12px rgba(15, 23, 42, 0.05)';
+            });
+        });
+    </script>
+</body></html>
