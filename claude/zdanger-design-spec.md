@@ -1,5 +1,9 @@
-# AlertaCalle — Especificación v3 (Laravel + handoff de vistas Stitch)
- 
+# ZDanger — Especificación de diseño (Laravel + handoff de vistas Stitch)
+
+> ℹ️ **Documento de diseño** (handoff de vistas, tokens Material, reglas de producto).
+> Para el estado técnico de implementación ver **`claude/zdanger-spec.md`**.
+> _Nota: "AlertaCalle" era el nombre previo del proyecto, hoy **ZDanger**._
+
 > **Reemplaza** la sección de stack de la v2. Esta versión asume **proyecto Laravel** con las vistas de Stitch en `resources/views`. El núcleo de producto (modelo de datos, lógica de confianza, privacidad, antiabuso) se mantiene; aquí se expresa en términos de Laravel y se añade el handoff de las vistas.
 > **Fuente de verdad de diseño:** el **front-matter YAML de `DESIGN.md`** (tokens Material). Donde la prosa de DESIGN.md cite hex distintos, **ignorarla**: gana el YAML (los screenshots se generaron con esos tokens).
  

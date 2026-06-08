@@ -116,7 +116,7 @@ export function MapboxMap({
                 [Math.min(...lngs) - 0.01, Math.min(...lats) - 0.01],
                 [Math.max(...lngs) + 0.01, Math.max(...lats) + 0.01],
             ];
-            mapRef.current.fitBounds(bounds, { padding: 60, maxZoom: 15, duration: 800 });
+            map.fitBounds(bounds, { padding: 60, maxZoom: 15, duration: 800 });
         }
 
         reports.forEach(report => {

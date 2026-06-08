@@ -1,6 +1,7 @@
 # ZDanger — Especificación técnica
 
 > Última actualización: 2026-06-08
+> 📐 Documento de **diseño** (handoff de vistas, tokens): ver `claude/zdanger-design-spec.md`
 
 ## Descripción general
 
@@ -370,10 +371,25 @@ VITE_MAPBOX_TOKEN=pk.eyJ1...  # Mapbox public token
   crear el mapa → `MutationObserver` dispara `setStyle()` → estilo en loading).
   Los markers son overlays del DOM y no dependen del estilo: se quitó el gate.
 
-### 🔄 Pendiente — Hito 2 (reporte con sustancia)
-- Geocodificación de la dirección del wizard (Mapbox Geocoding API → lat/lng)
-- Botón "Usar mi ubicación" (browser Geolocation API)
-- Subida real de evidencia al storage de `report_media`
+### ✅ Hito 2 — Reporte con sustancia
+- **Geocodificación** de la dirección del wizard vía Mapbox Geocoding API
+  (`resources/js/lib/mapbox-geocode.ts`), sesgada a Bogotá con `proximity` +
+  `bbox` para mantener resultados dentro de la ciudad
+- **Botón "Mi ubicación"** con `navigator.geolocation` + reverse geocoding
+  (rellena calle y barrio, fija lat/lng exactas con badge de confirmación)
+- **Subida real de evidencia**: input de archivos con thumbnails, envío vía
+  `router.post` con `forceFormData`, guardado en `storage/app/public/reports/{id}`
+  y registros en `report_media` (`php artisan storage:link` ejecutado)
+- Validación backend: máx. 3 archivos, jpg/png/mp4, 10 MB c/u
+- **Tests** (`tests/Feature/ReportSubmissionTest.php`, 4 casos): auth mixto,
+  envío con evidencia, address requerido, límites de media
+- Fix de infra: habilitado `RefreshDatabase` global en `tests/Pest.php`
+  (estaba comentado → 30 tests de auth/settings fallaban). Suite: 43 ✓
+
+### 🔄 Pendiente — Hito 3 (identidad)
+- Personalizar login/registro con identidad ZDanger
+- Mi Perfil real (reportes propios, reputación)
+- Formulario de Cuenta funcional en Ajustes
 
 ### 📋 Fase 2
 - Alertas push por zona (FCM)
