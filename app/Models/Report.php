@@ -93,8 +93,8 @@ class Report extends Model
             'confirms'    => $this->confirms_count,
             'denies'      => $this->denies_count,
             'status'      => $this->status,
-            'latitude'    => $this->latitude,
-            'longitude'   => $this->longitude,
+            'lat'         => $this->latitude,
+            'lng'         => $this->longitude,
         ];
     }
 }

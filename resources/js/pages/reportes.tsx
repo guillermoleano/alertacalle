@@ -2,8 +2,8 @@ import { Head } from '@inertiajs/react';
 import { ArrowDownUp, Search, Shield, ShieldAlert, ShieldCheck, X } from 'lucide-react';
 import { useState } from 'react';
 import { AppFrame } from '@/components/alertacalle/app-frame';
-import { ReportCard } from '@/components/alertacalle/report-card';
-import { demoReports, incidentTypes } from '@/data/demo-reports';
+import { ReportCard, type ReportSummary } from '@/components/alertacalle/report-card';
+import { incidentTypes } from '@/data/demo-reports';
 import { useStagger } from '@/hooks/use-stagger';
 import { cn } from '@/lib/utils';
 
@@ -25,7 +25,7 @@ const sortLabels: Record<SortOption, string> = {
 
 const riskOrder = { Alto: 3, Medio: 2, Bajo: 1 };
 
-export default function Reportes() {
+export default function Reportes({ reports = [] }: { reports?: ReportSummary[] }) {
     const [search,  setSearch]  = useState('');
     const [status,  setStatus]  = useState<StatusFilter>('Todos');
     const [type,    setType]    = useState('Todos');
@@ -34,7 +34,7 @@ export default function Reportes() {
 
     const allTypes = ['Todos', ...incidentTypes];
 
-    const filtered = demoReports
+    const filtered = reports
         .filter(r => {
             const matchStatus = status === 'Todos' || r.risk === status;
             const matchType   = type   === 'Todos' || r.type === type;
@@ -49,10 +49,10 @@ export default function Reportes() {
             return 0; // reciente: orden original
         });
 
-    const total = demoReports.length;
-    const alto  = demoReports.filter(r => r.risk === 'Alto').length;
-    const medio = demoReports.filter(r => r.risk === 'Medio').length;
-    const bajo  = demoReports.filter(r => r.risk === 'Bajo').length;
+    const total = reports.length;
+    const alto  = reports.filter(r => r.risk === 'Alto').length;
+    const medio = reports.filter(r => r.risk === 'Medio').length;
+    const bajo  = reports.filter(r => r.risk === 'Bajo').length;
 
     return (
         <AppFrame>

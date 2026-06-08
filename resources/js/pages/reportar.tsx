@@ -1,4 +1,4 @@
-import { Head } from '@inertiajs/react';
+import { Head, router } from '@inertiajs/react';
 import {
     Camera, CheckCircle2, ChevronRight, Clock, EyeOff,
     LocateFixed, MapPin, ShieldCheck, Upload, X,
@@ -20,11 +20,16 @@ export default function Reportar() {
     const [step,      setStep]      = useState<Step>(1);
     const [incType,   setIncType]   = useState(incidentTypes[0]);
     const [location,  setLocation]  = useState('');
+    const [cross,     setCross]     = useState('');
+    const [barrio,    setBarrio]    = useState('');
     const [datetime,  setDatetime]  = useState('');
     const [desc,      setDesc]      = useState('');
     const [anon,      setAnon]      = useState(true);
     const [files,     setFiles]     = useState<string[]>([]);
-    const [submitted, setSubmitted] = useState(false);
+    const [processing, setProcessing] = useState(false);
+    const [errors,    setErrors]    = useState<Record<string, string>>({});
+
+    const canSubmit = location.trim().length > 0;
 
     function addFakeFile() {
         if (files.length >= 3) return;
@@ -35,30 +40,30 @@ export default function Reportar() {
         setFiles(f => f.filter((_, i) => i !== idx));
     }
 
-    function submit() { setSubmitted(true); }
+    function submit() {
+        if (!canSubmit || processing) {
+            if (!canSubmit) setStep(1); // falta la ubicación
+            return;
+        }
 
-    if (submitted) return (
-        <AppFrame>
-            <Head title="Reporte enviado" />
-            <section className="flex min-h-[70vh] flex-col items-center justify-center px-4 py-12 text-center">
-                <span className="mb-6 flex size-20 items-center justify-center rounded-full bg-[var(--ac-secondary-fixed)] animate-in zoom-in-75 duration-300">
-                    <CheckCircle2 className="size-10 text-[var(--ac-secondary)]" />
-                </span>
-                <h2 className="text-2xl font-bold text-[var(--ac-on-surface)]">¡Reporte enviado!</h2>
-                <p className="mt-3 max-w-sm text-sm leading-6 text-[var(--ac-on-surface-variant)]">
-                    Tu reporte está en revisión comunitaria. Si recibe suficientes confirmaciones aparecerá en el mapa.
-                </p>
-                <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-                    <a href="/mapa" className="inline-flex min-h-11 items-center justify-center rounded-xl bg-[var(--ac-primary)] px-6 text-sm font-bold text-white transition-all hover:opacity-90 active:scale-95">
-                        Ver en el mapa
-                    </a>
-                    <button type="button" onClick={() => setSubmitted(false)} className="inline-flex min-h-11 items-center justify-center rounded-xl border border-[var(--ac-outline-variant)] px-6 text-sm font-bold text-[var(--ac-on-surface)] transition-all hover:bg-[var(--ac-surface-container)] active:scale-95">
-                        Nuevo reporte
-                    </button>
-                </div>
-            </section>
-        </AppFrame>
-    );
+        const address = cross.trim()
+            ? `${location.trim()} con ${cross.trim()}`
+            : location.trim();
+
+        router.post('/reportar', {
+            type:         incType,
+            title:        incType,
+            description:  desc || null,
+            address,
+            neighborhood: barrio || null,
+            occurred_at:  datetime || null,
+            anonymous:    anon,
+        }, {
+            onStart:   () => setProcessing(true),
+            onError:   (e) => setErrors(e as Record<string, string>),
+            onFinish:  () => setProcessing(false),
+        });
+    }
 
     return (
         <AppFrame>
@@ -146,13 +151,21 @@ export default function Reportar() {
                                         <input
                                             value={location}
                                             onChange={e => setLocation(e.target.value)}
-                                            className="min-h-11 rounded-xl border border-[var(--ac-outline-variant)] bg-white px-4 text-sm outline-none focus:ring-2 focus:ring-[var(--ac-primary)]"
+                                            className={cn(
+                                                'min-h-11 rounded-xl border bg-white px-4 text-sm outline-none focus:ring-2 focus:ring-[var(--ac-primary)]',
+                                                errors.address ? 'border-red-400' : 'border-[var(--ac-outline-variant)]',
+                                            )}
                                             placeholder="Ej: Av. Corrientes"
                                         />
+                                        {errors.address && (
+                                            <span className="text-[11px] font-medium text-red-500">{errors.address}</span>
+                                        )}
                                     </label>
                                     <label className="grid gap-1.5">
                                         <span className="text-[13px] font-semibold text-[var(--ac-on-surface)]">Cruce / Referencia</span>
                                         <input
+                                            value={cross}
+                                            onChange={e => setCross(e.target.value)}
                                             className="min-h-11 rounded-xl border border-[var(--ac-outline-variant)] bg-white px-4 text-sm outline-none focus:ring-2 focus:ring-[var(--ac-primary)]"
                                             placeholder="Ej: con Pueyrredón"
                                         />
@@ -160,6 +173,8 @@ export default function Reportar() {
                                     <label className="grid gap-1.5">
                                         <span className="text-[13px] font-semibold text-[var(--ac-on-surface)]">Barrio</span>
                                         <input
+                                            value={barrio}
+                                            onChange={e => setBarrio(e.target.value)}
                                             className="min-h-11 rounded-xl border border-[var(--ac-outline-variant)] bg-white px-4 text-sm outline-none focus:ring-2 focus:ring-[var(--ac-primary)]"
                                             placeholder="Ej: Palermo"
                                         />
@@ -341,9 +356,11 @@ export default function Reportar() {
                                 <button
                                     type="button"
                                     onClick={submit}
-                                    className="inline-flex min-h-11 items-center gap-2 rounded-xl bg-[var(--ac-secondary)] px-6 text-sm font-bold text-white transition-all hover:opacity-90 active:scale-95 shadow-md"
+                                    disabled={processing}
+                                    className="inline-flex min-h-11 items-center gap-2 rounded-xl bg-[var(--ac-secondary)] px-6 text-sm font-bold text-white transition-all hover:opacity-90 active:scale-95 shadow-md disabled:opacity-60 disabled:cursor-not-allowed"
                                 >
-                                    <CheckCircle2 className="size-4" /> Enviar reporte
+                                    <CheckCircle2 className="size-4" />
+                                    {processing ? 'Enviando…' : 'Enviar reporte'}
                                 </button>
                             )}
                         </div>

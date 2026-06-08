@@ -62,7 +62,7 @@ class ReportController extends Controller
     {
         $data = $request->validate([
             'type'        => 'required|string|max:100',
-            'title'       => 'required|string|max:200',
+            'title'       => 'nullable|string|max:200',
             'description' => 'nullable|string|max:280',
             'address'     => 'required|string|max:300',
             'neighborhood'=> 'nullable|string|max:100',
@@ -74,25 +74,28 @@ class ReportController extends Controller
         ]);
 
         // Si no viene title calculamos uno del tipo
-        $data['title'] ??= $data['type'];
-        $data['user_id'] = auth()->id();
+        $data['title']     = $data['title'] ?: $data['type'];
+        $data['user_id']   = auth()->id();
         $data['anonymous'] = $data['anonymous'] ?? true;
+        $data['status']    = 'pending';
 
         Report::create($data);
 
-        return redirect()->route('reportes')
-            ->with('success', 'Reporte enviado. Quedará visible al recibir validaciones.');
+        return redirect()->route('reportes')->with('toast', [
+            'type'    => 'success',
+            'message' => 'Reporte enviado. Quedará visible al recibir validaciones.',
+        ]);
     }
 
-    /** POST /api/reports/{report}/vote — votar */
-    public function vote(Request $request, Report $report): \Illuminate\Http\JsonResponse
+    /** POST /reportes/{report}/vote — votar (validación comunitaria) */
+    public function vote(Request $request, Report $report): RedirectResponse
     {
         $request->validate(['vote' => 'required|in:confirm,deny']);
 
         $userId = auth()->id();
         $ip     = $request->ip();
 
-        // Evitar doble voto por IP si no está autenticado
+        // Evitar doble voto por usuario / IP
         $existing = ReportVote::where('report_id', $report->id)
             ->where(function ($q) use ($userId, $ip) {
                 if ($userId) $q->where('user_id', $userId);
@@ -101,16 +104,15 @@ class ReportController extends Controller
             ->first();
 
         if ($existing) {
-            // Cambiar voto si es distinto
-            if ($existing->vote !== $request->vote) {
-                // Revertir voto anterior
-                if ($existing->vote === 'confirm') $report->decrement('confirms_count');
-                else                               $report->decrement('denies_count');
-
-                $existing->update(['vote' => $request->vote]);
-            } else {
-                return response()->json(['message' => 'Ya votaste este reporte'], 409);
+            if ($existing->vote === $request->vote) {
+                return back(); // mismo voto: no-op silencioso
             }
+
+            // Cambiar voto: revertir el anterior
+            if ($existing->vote === 'confirm') $report->decrement('confirms_count');
+            else                               $report->decrement('denies_count');
+
+            $existing->update(['vote' => $request->vote]);
         } else {
             ReportVote::create([
                 'report_id'  => $report->id,
@@ -120,17 +122,13 @@ class ReportController extends Controller
             ]);
         }
 
-        // Actualizar contadores
+        // Aplicar el nuevo voto
         if ($request->vote === 'confirm') $report->increment('confirms_count');
         else                              $report->increment('denies_count');
 
         $report->refresh();
         $report->recalculateTrust();
 
-        return response()->json([
-            'confirms'    => $report->confirms_count,
-            'denies'      => $report->denies_count,
-            'trust_score' => $report->trust_score,
-        ]);
+        return back();
     }
 }

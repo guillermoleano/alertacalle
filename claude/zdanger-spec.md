@@ -1,72 +1,188 @@
-# ZDanger — Especificación técnica (MVP)
+# ZDanger — Especificación técnica
+
+> Última actualización: 2026-06-08
 
 ## Descripción general
 
-App móvil y web para el reporte ciudadano de asaltos y robos. Los usuarios pueden registrar incidentes con ubicación GPS, tipo de delito, descripción y evidencia fotográfica. Los reportes se visualizan en un mapa interactivo con alertas por zonas.
+App web (con proyección a móvil) para el reporte ciudadano de asaltos y robos en ciudades latinoamericanas. Los usuarios pueden registrar incidentes con ubicación, tipo de delito, descripción y evidencia fotográfica. Los reportes se visualizan en un mapa interactivo de Mapbox con pines por nivel de riesgo, sistema de validación comunitaria y puntaje de confianza.
 
 ---
 
-## Stack tecnológico
+## Stack tecnológico actual
 
-| Capa | Tecnología |
-|---|---|
-| Backend API | Laravel 11 (PHP 8.3) |
-| Base de datos | PostgreSQL + PostGIS |
-| Frontend web | React + TypeScript + Vite |
-| App móvil | React Native (Expo) |
-| Mapa | Google Maps SDK / React Native Maps |
-| Storage de archivos | Cloudflare R2 (compatible S3) |
-| Autenticación | Laravel Sanctum (tokens) |
-| Push notifications | Firebase Cloud Messaging (FCM) |
-| Cache | Redis |
+| Capa | Tecnología | Estado |
+|---|---|---|
+| Backend | Laravel 11 (PHP 8.3) | ✅ Activo |
+| SPA bridge | Inertia.js v3 | ✅ Activo |
+| Frontend | React 19 + TypeScript + Vite 8 | ✅ Activo |
+| Estilos | Tailwind CSS v4 + sistema de tokens `--ac-*` (Material Design 3) | ✅ Activo |
+| Mapa | Mapbox GL JS (`mapbox-gl`) | ✅ Integrado |
+| Base de datos | SQLite (dev) → PostgreSQL + PostGIS (prod) | 🔄 Dev: SQLite |
+| Storage de archivos | Local (dev) → Cloudflare R2 / S3 (prod) | Pendiente |
+| Autenticación | Laravel Fortify + Passkeys (`@laravel/passkeys`) | ✅ Activo |
+| Push notifications | Firebase Cloud Messaging (FCM) | Fase 2 |
+| Cache | Database (dev) → Redis (prod) | 🔄 Dev: Database |
+| Servidor local | Laravel Herd (`zdanger.test`) | ✅ Activo |
+
+---
+
+## Arquitectura frontend
+
+### Patrón
+Inertia.js con React — no hay API REST separada en esta etapa. Cada página es un componente `.tsx` en `resources/js/pages/` que recibe props del controlador Laravel directamente (sin fetch/axios).
+
+### Estructura de directorios
+```
+resources/js/
+├── components/
+│   └── alertacalle/
+│       ├── app-frame.tsx          — Shell principal: sidebar, header, nav
+│       ├── report-card.tsx        — Card de reporte con votos y trust score
+│       ├── mapbox-map.tsx         — Mapa interactivo (Mapbox GL JS)
+│       └── calm-map-preview.tsx   — SVG preview (legacy, reemplazado por MapboxMap)
+├── data/
+│   └── demo-reports.ts            — Datos de demostración con coords reales de Bogotá
+├── hooks/
+│   ├── use-stagger.ts             — Animaciones de entrada escalonadas
+│   └── use-appearance.ts          — Toggle dark/light mode
+├── pages/
+│   ├── mapa.tsx                   — Mapa de riesgo con sidebar de reportes
+│   ├── reportes.tsx               — Grilla de reportes con filtros y ordenamiento
+│   ├── reportar.tsx               — Wizard 3 pasos para crear reporte
+│   ├── ajustes.tsx                — Configuración de cuenta, notifs, privacidad, apariencia
+│   └── mi-perfil.tsx              — Perfil del usuario
+└── css/
+    └── app.css                    — Tokens --ac-*, dark mode, keyframes
+```
+
+---
+
+## Sistema de diseño
+
+### Tokens CSS (Material Design 3)
+Todos los colores se referencian mediante variables `--ac-*` en lugar de clases hardcodeadas. Esto garantiza que dark mode funcione automáticamente al sobrescribir los tokens en `.dark {}`.
+
+```css
+/* Light (default en :root) */
+--ac-primary: #00236f
+--ac-secondary: #006b5f
+--ac-surface-container-lowest: #ffffff
+--ac-on-surface: #131b2e
+--ac-outline-variant: #c5c5d3
+
+/* Dark (sobrescrito en .dark) */
+--ac-primary: #b6c4ff
+--ac-secondary: #4fdbc8
+--ac-surface-container-lowest: #090c12
+--ac-on-surface: #dfe3f7
+--ac-outline-variant: #2c3348
+```
+
+### Dark mode
+- Activado por `useAppearance` hook → agrega clase `.dark` a `<html>`
+- Persistido en `localStorage` y cookie
+- `ThemeToggle` en el header (ícono sol/luna con animación de rotación)
+- Mapbox cambia automáticamente de estilo `light-v11` → `dark-v11` vía `MutationObserver`
+
+### Animaciones
+- `useStagger` hook — anima los hijos de un contenedor con delays escalonados (60ms entre elementos)
+- `ac-card-enter` keyframe — fade + slide up en montaje de cards
+- `ac-btn-ripple` — efecto ripple en botones primarios
+- `active:scale-95` — feedback táctil en todos los botones interactivos
+
+---
+
+## Componente MapboxMap
+
+**Archivo:** `resources/js/components/alertacalle/mapbox-map.tsx`
+
+**Token:** `VITE_MAPBOX_TOKEN` en `.env`
+
+### Features implementadas
+- Pines circulares con emoji por tipo de incidente y color por nivel de riesgo
+  - 🔴 Alto → `#ef4444`
+  - 🟡 Medio → `#f59e0b`
+  - 🟢 Bajo → `#10b981`
+- Anillo pulsante (`zdanger-ping`) en pines de **alto riesgo**
+- Hover con `scale(1.15)` en el pin
+- **Popup** al hacer click: tipo, título, ubicación, tiempo, trust score
+- `fitBounds` automático al cargar — encuadra todos los reportes visibles
+- Sincronización bidireccional con sidebar: click en pin → resalta card; click en card → resalta pin
+- Filtros de tipo y búsqueda actualizan los pines en tiempo real
+- Sync dark/light mode automático vía `MutationObserver`
+- Fallback UI elegante cuando `VITE_MAPBOX_TOKEN` no está configurado
+
+### Props
+```typescript
+interface Props {
+    reports: ReportSummary[];
+    center?: [number, number];   // default: Bogotá [-74.0721, 4.7110]
+    zoom?: number;               // default: 13
+    className?: string;
+    onSelectReport?: (id: string | null) => void;
+    selectedReportId?: string | null;
+}
+```
 
 ---
 
 ## Modelos de datos
 
-### `users`
+### `users` (existente — Laravel Fortify)
 ```
 id (uuid)
 name (string)
 email (string, unique)
 phone (string, nullable)
 password (hashed)
-role (enum: citizen, moderator, authority)
-fcm_token (string, nullable) — para notificaciones push
+role (enum: citizen, moderator, authority) — pendiente agregar
+fcm_token (string, nullable) — Fase 2
 created_at / updated_at
 ```
 
 ### `reports`
 ```
 id (uuid)
-user_id (uuid, FK → users) — nullable si se permite anónimo
-type (enum: mugging, vehicle_theft, home_robbery, other)
+user_id (uuid, FK → users, nullable — reportes anónimos)
+type (enum: mugging, vehicle_theft, phone_theft, pickpocket,
+           motorcycle_robbery, bank_followup, intimidation, other)
+title (string)
 description (text)
 status (enum: pending, validated, rejected, fake)
+risk_level (enum: Alto, Medio, Bajo)
 latitude (decimal 10,7)
 longitude (decimal 10,7)
-address (string) — calle, cruce, barrio
-neighborhood (string)
-city (string)
-occurred_at (timestamp) — hora real del hecho
+address (string)
+cross_street (string, nullable)
+neighborhood (string, nullable)
+city (string, default: 'Bogotá')
+confirms_count (integer, default: 0)
+denies_count (integer, default: 0)
+trust_score (integer, default: 0) — 0-100
+occurred_at (timestamp)
 created_at / updated_at
-```
-
-### `report_media`
-```
-id (uuid)
-report_id (uuid, FK → reports)
-url (string) — URL en R2/S3
-type (enum: photo, video)
-created_at
 ```
 
 ### `report_votes`
 ```
 id (uuid)
 report_id (uuid, FK → reports)
-user_id (uuid, FK → users)
-vote (enum: confirm, fake)
+user_id (uuid, FK → users, nullable)
+ip_address (string) — para votos anónimos
+vote (enum: confirm, deny)
+created_at
+UNIQUE(report_id, user_id) — un voto por usuario por reporte
+```
+
+### `report_media`
+```
+id (uuid)
+report_id (uuid, FK → reports)
+disk (string, default: 'local')
+path (string)
+url (string, virtual)
+mime_type (string)
+size_bytes (integer)
 created_at
 ```
 
@@ -74,56 +190,117 @@ created_at
 ```
 id (uuid)
 user_id (uuid, FK → users)
-label (string) — ej: "Casa", "Trabajo"
+label (string) — ej: "Casa", "Trabajo", "Gym"
 latitude (decimal)
 longitude (decimal)
-radius_meters (integer) — default: 500
-created_at
+radius_meters (integer, default: 500)
+active (boolean, default: true)
+created_at / updated_at
 ```
 
 ---
 
-## API Endpoints (REST)
+## Trust Score
 
-### Autenticación
-```
-POST   /api/auth/register
-POST   /api/auth/login
-POST   /api/auth/logout
-GET    /api/auth/me
-```
+El puntaje de confianza (0-100) se calcula con la fórmula:
 
-### Reportes
 ```
-GET    /api/reports              — listado paginado con filtros
-POST   /api/reports              — crear reporte (multipart/form-data para archivos)
-GET    /api/reports/{id}         — detalle de un reporte
-PATCH  /api/reports/{id}/status  — cambiar estado (moderador/autoridad)
-DELETE /api/reports/{id}         — eliminar propio reporte
+trust_score = (confirms / (confirms + denies)) * 100
+            * log10(confirms + denies + 1) / log10(11)
+            (capped en 100)
 ```
 
-### Mapa
-```
-GET    /api/reports/map          — reportes en bounding box (params: lat, lng, radius, from, to, type)
-GET    /api/reports/heatmap      — puntos para mapa de calor
+Esto pondera por cantidad de votos: un reporte con 10 confirms/0 denies pesa más que uno con 1/0.
+
+### Umbrales de risk_level automático
+| trust_score | risk_level |
+|---|---|
+| ≥ 70 | Alto |
+| 40–69 | Medio |
+| < 40 | Bajo |
+
+---
+
+## Tipos de incidente
+
+| Key (DB) | Label UI | Emoji |
+|---|---|---|
+| `phone_theft` | Hurto celular | 📱 |
+| `mugging` | Atraco a pie | 🚶 |
+| `motorcycle_robbery` | Atraco en moto | 🏍️ |
+| `bank_followup` | Fleteo | 💳 |
+| `pickpocket` | Cosquilleo | 👋 |
+| `intimidation` | Intimidación con arma | ⚠️ |
+| `other` | Otro | 📋 |
+
+---
+
+## Páginas implementadas
+
+### `/mapa` — Mapa de riesgo
+- Stats bar: reportes hoy, zona alto riesgo, validados, confianza promedio
+- Búsqueda en tiempo real (título + ubicación)
+- Chips de filtro por tipo de incidente
+- **Mapa Mapbox** con pines, popups, fitBounds automático
+- Sidebar con lista de reportes filtrados
+- Selección bidireccional mapa ↔ sidebar
+
+### `/reportes` — Grilla de reportes
+- Stats: total, alto/medio/bajo riesgo
+- Búsqueda + ordenamiento (reciente / confianza / riesgo)
+- Tabs de nivel de riesgo
+- Chips de tipo de incidente
+- Grilla responsive (1/2/3 columnas) con `useStagger`
+- Empty state con "Limpiar filtros"
+
+### `/reportar` — Wizard de reporte (3 pasos)
+1. **Ubicación** — calle, cruce, barrio, fecha/hora del hecho
+2. **Detalles** — tipo (radio grid con emojis), descripción con contador, toggle anónimo
+3. **Evidencia** — drag & drop de fotos, previews, nota de privacidad
+- Indicador de pasos con `CheckCircle2` para completados
+- Pantalla de éxito con animación zoom tras submit
+
+### `/ajustes` — Configuración
+- **Cuenta** — nombre, email, teléfono (badge PENDIENTE), contraseña
+- **Notificaciones** — 4 toggles + chips de sonido
+- **Privacidad** — 3 toggles + exportar datos / política
+- **Apariencia** — chips de tema, estilos de mapa, slider de tamaño de fuente
+- **Zonas de alerta** — lista de zonas con hover edit/delete
+- **Zona de peligro** — logout + modal de eliminar cuenta
+- `useStagger` en secciones
+
+### `/mi-perfil` — Perfil
+- Info del usuario, estadísticas de contribución
+
+---
+
+## Rutas web (Inertia)
+
+```php
+Route::get('/mapa',     [ReportController::class, 'mapa']);
+Route::get('/reportes', [ReportController::class, 'index']);
+Route::get('/reportar', [ReportController::class, 'create']);
+Route::post('/reportar', [ReportController::class, 'store']);
+Route::post('/reports/{report}/vote', [ReportController::class, 'vote']);
+Route::get('/ajustes',   fn() => Inertia::render('ajustes'));
+Route::get('/mi-perfil', fn() => Inertia::render('mi-perfil'));
 ```
 
-### Votos (validación comunitaria)
-```
-POST   /api/reports/{id}/vote    — body: { vote: "confirm" | "fake" }
-```
+> ⚠️ Las rutas del `ReportController` están creadas en el controlador pero **aún no registradas en `web.php`** (pendiente).
 
-### Zonas de alerta
-```
-GET    /api/alert-zones
-POST   /api/alert-zones
-DELETE /api/alert-zones/{id}
-```
+---
 
-### Media
-```
-POST   /api/reports/{id}/media   — subir foto/video
-DELETE /api/media/{id}
+## Variables de entorno relevantes
+
+```env
+APP_NAME=ZDanger
+APP_URL=http://zdanger.test
+
+DB_CONNECTION=sqlite          # dev
+# DB_CONNECTION=pgsql         # prod (con PostGIS para queries geoespaciales)
+
+VITE_APP_NAME="${APP_NAME}"
+VITE_MAPBOX_TOKEN=pk.eyJ1...  # Mapbox public token
 ```
 
 ---
@@ -131,65 +308,82 @@ DELETE /api/media/{id}
 ## Reglas de negocio
 
 ### Validación de reportes
-- Un reporte nuevo queda en estado `pending`
-- Si recibe 5 votos `confirm` → pasa a `validated`
-- Si recibe 3 votos `fake` → pasa a `fake` y se oculta del mapa
-- Moderadores y autoridades pueden cambiar el estado manualmente
-
-### Alertas push
-- Al crearse un reporte `validated`, el sistema busca usuarios con `alert_zones` dentro del radio del reporte
-- Se envía notificación FCM a esos usuarios
+- Reporte nuevo → estado `pending`
+- 5 votos `confirm` → `validated` (aparece en mapa público)
+- 3 votos `deny` → `fake` (oculto del mapa)
+- Moderadores/autoridades pueden cambiar estado manualmente
 
 ### Anonimato
-- El `user_id` en `reports` puede ser null si el usuario elige reportar anónimamente
+- `user_id` nullable → reportes anónimos permitidos
 - Los datos del reportante nunca son públicos en la API
+- Votos anónimos se trackean por IP (un voto por IP por reporte)
 
 ### Media
 - Máximo 3 archivos por reporte
-- Formatos permitidos: jpg, png, mp4
+- Formatos: jpg, png, mp4
 - Tamaño máximo: 10MB por archivo
 
----
-
-## Filtros del mapa (GET /api/reports/map)
-
-| Parámetro | Tipo | Descripción |
-|---|---|---|
-| lat | float | Latitud centro |
-| lng | float | Longitud centro |
-| radius | integer | Radio en metros (default 2000) |
-| type | string | Tipo de incidente (opcional) |
-| status | string | pending, validated (default: validated) |
-| from | date | Fecha desde (default: -30 días) |
-| to | date | Fecha hasta (default: hoy) |
+### Rate limiting
+- 5 reportes por hora por usuario/IP
+- 10 votos por hora por usuario/IP
 
 ---
 
 ## Consideraciones de seguridad
 
-- Rate limiting en endpoints de reporte: máximo 5 reportes por hora por usuario/IP
-- Validación de coordenadas dentro de rango geográfico válido
-- Las URLs de media son firmadas (tiempo de expiración) o privadas
-- Sanitización de descripciones (evitar XSS si se renderiza en web)
-- Autenticación requerida para votar y crear alertas; opcional para ver el mapa
+- Rate limiting en POST `/reportar` y `/vote`
+- Validación de coordenadas en rango geográfico válido
+- URLs de media firmadas con expiración (producción)
+- Sanitización de texto (evitar XSS)
+- Auth requerida para crear reportes y votar; pública la lectura del mapa
 
 ---
 
-## Fases de desarrollo
+## Estado de desarrollo
 
-### Fase 1 — MVP
-- [x] Auth (registro, login)
-- [x] CRUD de reportes con foto y GPS
-- [x] Mapa con reportes validados
-- [x] Votos comunitarios
+### ✅ Completado
+- Shell de la app (sidebar, header, dark mode, nav)
+- Sistema de tokens `--ac-*` con dark mode completo
+- Páginas: Mapa, Reportes, Reportar (wizard), Ajustes, Mi Perfil
+- Componente `MapboxMap` con pines, popups, dark mode sync, fitBounds
+- Componente `ReportCard` con trust score bar y sistema de votos
+- Hook `useStagger` para animaciones escalonadas
+- Migraciones: `reports`, `report_votes`, `report_media`
+- Modelos: `Report`, `ReportVote`, `ReportMedia`
+- Controlador `ReportController` (métodos: mapa, index, create, store, vote)
+- Seeder con 5 reportes de demostración (coords reales de Bogotá)
 
-### Fase 2
-- [ ] Alertas push por zona
-- [ ] Panel de moderación
-- [ ] App móvil (React Native)
+### ✅ Hito 1 — Backend conectado (MVP funcional)
+- Rutas del `ReportController` registradas en `web.php` con **auth mixto**
+  (mapa/reportes públicos; reportar/votar requieren sesión)
+- Migraciones corridas + seeder cargado (5 reportes reales)
+- `mapa.tsx` y `reportes.tsx` consumen props reales desde la DB (ya no `demoReports`)
+- Wizard `/reportar` conectado al `store()` vía Inertia `router.post`
+  (validación, estado de envío, redirect con flash toast)
+- Votos persistidos vía `router.post` con feedback optimista en `ReportCard`
+- `Report::toInertia()` serializa `lat`/`lng` (shape que espera el frontend)
+- Flash toasts: `flash.toast` compartido en `HandleInertiaRequests` +
+  `useFlashToast` reescrito sobre el bus de eventos del router (vive fuera del
+  contexto Inertia, por eso no usa `usePage`)
+- **Fix MapboxMap**: los markers se agregaban con un gate sobre `styleLoaded`
+  que nunca se cumplía (el `initializeTheme()` togglea la clase `.dark` tras
+  crear el mapa → `MutationObserver` dispara `setStyle()` → estilo en loading).
+  Los markers son overlays del DOM y no dependen del estilo: se quitó el gate.
 
-### Fase 3
-- [ ] Acceso para autoridades con validación oficial
-- [ ] Mapa de calor
-- [ ] Estadísticas públicas por barrio/ciudad
-- [ ] Exportación de datos para municipios
+### 🔄 Pendiente — Hito 2 (reporte con sustancia)
+- Geocodificación de la dirección del wizard (Mapbox Geocoding API → lat/lng)
+- Botón "Usar mi ubicación" (browser Geolocation API)
+- Subida real de evidencia al storage de `report_media`
+
+### 📋 Fase 2
+- Alertas push por zona (FCM)
+- Panel de moderación
+- Heatmap (Mapbox Heatmap layer)
+- App móvil (React Native + Expo)
+- Estadísticas públicas por barrio/ciudad
+
+### 📋 Fase 3
+- Acceso para autoridades con validación oficial
+- Exportación de datos para municipios
+- Clustering de pines en el mapa (Mapbox Supercluster)
+- Modo offline (Service Worker + IndexedDB)

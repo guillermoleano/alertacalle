@@ -3,8 +3,8 @@ import { Filter, PlusCircle, Search, SlidersHorizontal, X } from 'lucide-react';
 import { useState } from 'react';
 import { AppFrame } from '@/components/alertacalle/app-frame';
 import { MapboxMap } from '@/components/alertacalle/mapbox-map';
-import { ReportCard } from '@/components/alertacalle/report-card';
-import { demoReports, incidentTypes } from '@/data/demo-reports';
+import { ReportCard, type ReportSummary } from '@/components/alertacalle/report-card';
+import { incidentTypes } from '@/data/demo-reports';
 import { cn } from '@/lib/utils';
 
 const stats = [
@@ -14,15 +14,15 @@ const stats = [
     { label: 'Confianza prom.',    value: '62%', color: 'text-[var(--ac-primary)]',              bg: 'bg-[var(--ac-primary-fixed)]/40'        },
 ];
 
-export default function Mapa() {
+export default function Mapa({ reports = [] }: { reports?: ReportSummary[] }) {
     const [activeType,       setActiveType]       = useState<string>('Todos');
     const [showFilters,      setShowFilters]      = useState(false);
     const [search,           setSearch]           = useState('');
-    const [selectedReportId, setSelectedReportId] = useState<string | null>(null);
+    const [selectedReportId, setSelectedReportId] = useState<string | number | null>(null);
 
     const allTypes = ['Todos', ...incidentTypes];
 
-    const filtered = demoReports.filter(r => {
+    const filtered = reports.filter(r => {
         const matchType   = activeType === 'Todos' || r.type === activeType;
         const matchSearch = search === '' ||
             r.title.toLowerCase().includes(search.toLowerCase()) ||

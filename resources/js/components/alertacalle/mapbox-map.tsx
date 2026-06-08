@@ -27,8 +27,8 @@ interface Props {
     center?: [number, number];
     zoom?: number;
     className?: string;
-    onSelectReport?: (id: string | null) => void;
-    selectedReportId?: string | null;
+    onSelectReport?: (id: string | number | null) => void;
+    selectedReportId?: string | number | null;
 }
 
 export function MapboxMap({
@@ -94,11 +94,14 @@ export function MapboxMap({
 
     /* ── add / update markers when reports change ──────────── */
     useEffect(() => {
-        if (!ready || !mapRef.current) return;
+        const map = mapRef.current;
+        // Los markers son overlays del DOM (no dependen de que el estilo esté
+        // cargado), así que basta con tener la instancia del mapa.
+        if (!map) return;
 
         /* remove markers that no longer exist */
         Object.keys(markersRef.current).forEach(id => {
-            if (!reports.find(r => r.id === id)) {
+            if (!reports.find(r => String(r.id) === id)) {
                 markersRef.current[id].remove();
                 delete markersRef.current[id];
             }
@@ -230,12 +233,15 @@ export function MapboxMap({
 
     /* ── highlight selected marker ─────────────────────────── */
     useEffect(() => {
+        const selected = selectedReportId == null ? null : String(selectedReportId);
         Object.entries(markersRef.current).forEach(([id, marker]) => {
             const pin = marker.getElement().querySelector('span:last-child') as HTMLElement | null;
             if (!pin) return;
-            pin.style.transform = id === selectedReportId ? 'scale(1.25)' : 'scale(1)';
-            pin.style.boxShadow = id === selectedReportId
-                ? `0 0 0 3px white, 0 0 0 5px ${RISK_COLORS[reports.find(r => r.id === id)?.risk ?? 'Bajo']}`
+            const isSelected = id === selected;
+            const risk = reports.find(r => String(r.id) === id)?.risk ?? 'Bajo';
+            pin.style.transform = isSelected ? 'scale(1.25)' : 'scale(1)';
+            pin.style.boxShadow = isSelected
+                ? `0 0 0 3px white, 0 0 0 5px ${RISK_COLORS[risk]}`
                 : '0 2px 8px rgba(0,0,0,0.25)';
         });
     }, [selectedReportId, reports]);

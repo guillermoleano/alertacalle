@@ -1,9 +1,10 @@
-import { Clock, MapPin, ShieldCheck, ThumbsDown, ThumbsUp, TrendingUp } from 'lucide-react';
+import { router } from '@inertiajs/react';
+import { Clock, MapPin, ShieldCheck, ThumbsDown, ThumbsUp } from 'lucide-react';
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
 
 export type ReportSummary = {
-    id: string;
+    id: string | number;
     title: string;
     type: string;
     location: string;
@@ -43,9 +44,18 @@ export function ReportCard({ report }: { report: ReportSummary }) {
 
     function vote(dir: 'up' | 'down') {
         if (voted === dir) return;
+
+        // feedback optimista inmediato
         if (dir === 'up')   { setConfirms(c => c + 1); if (voted === 'down') setDenies(d => d - 1); }
         if (dir === 'down') { setDenies(d => d + 1);   if (voted === 'up')   setConfirms(c => c - 1); }
         setVoted(dir);
+
+        // persistir en el backend (guest → redirige a login por middleware auth)
+        router.post(
+            `/reportes/${report.id}/vote`,
+            { vote: dir === 'up' ? 'confirm' : 'deny' },
+            { preserveScroll: true, preserveState: true },
+        );
     }
 
     return (
