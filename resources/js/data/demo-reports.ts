@@ -13,6 +13,8 @@ export const demoReports: ReportSummary[] = [
         trustScore: 82,
         confirms: 14,
         denies: 1,
+        lat: 4.6869,
+        lng: -74.0532,
     },
     {
         id: 'r-002',
@@ -26,6 +28,8 @@ export const demoReports: ReportSummary[] = [
         trustScore: 61,
         confirms: 8,
         denies: 2,
+        lat: 4.6772,
+        lng: -74.0485,
     },
     {
         id: 'r-003',
@@ -39,6 +43,38 @@ export const demoReports: ReportSummary[] = [
         trustScore: 44,
         confirms: 5,
         denies: 1,
+        lat: 4.6950,
+        lng: -74.0440,
+    },
+    {
+        id: 'r-004',
+        title: 'Atraco en moto',
+        type: 'Atraco en moto',
+        location: 'Av. El Dorado con Carrera 50',
+        description:
+            'Dos sujetos en motocicleta robaron a un peatón en el semáforo durante hora pico.',
+        time: 'Hace 2 horas',
+        risk: 'Alto',
+        trustScore: 75,
+        confirms: 11,
+        denies: 0,
+        lat: 4.6580,
+        lng: -74.0910,
+    },
+    {
+        id: 'r-005',
+        title: 'Fleteo bancario',
+        type: 'Fleteo',
+        location: 'Salida Banco Popular Chapinero',
+        description:
+            'Víctima seguida desde el banco hasta la Calle 57. Le sustrajeron efectivo recién retirado.',
+        time: 'Hace 3 horas',
+        risk: 'Alto',
+        trustScore: 90,
+        confirms: 20,
+        denies: 2,
+        lat: 4.6440,
+        lng: -74.0660,
     },
 ];
 

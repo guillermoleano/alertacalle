@@ -1,0 +1,788 @@
+<!DOCTYPE html>
+<html lang="es-CO">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        colors: {
+          "on-secondary-fixed-variant": "#005048",
+          "on-primary-fixed": "#00164e",
+          "surface-container": "#eaedff",
+          "primary-fixed": "#dce1ff",
+          "surface-container-high": "#e2e7ff",
+          "on-error": "#ffffff",
+          "inverse-primary": "#b6c4ff",
+          "on-surface": "#131b2e",
+          "primary-fixed-dim": "#b6c4ff",
+          "on-primary": "#ffffff",
+          "on-tertiary-fixed-variant": "#653e00",
+          "surface-container-low": "#f2f3ff",
+          "on-secondary-fixed": "#00201c",
+          "inverse-on-surface": "#eef0ff",
+          "secondary-fixed": "#71f8e4",
+          "secondary": "#006b5f",
+          "on-tertiary": "#ffffff",
+          "secondary-container": "#6df5e1",
+          "tertiary-fixed-dim": "#ffb95f",
+          "tertiary": "#3e2400",
+          "on-surface-variant": "#444651",
+          "background": "#faf8ff",
+          "secondary-fixed-dim": "#4fdbc8",
+          "outline-variant": "#c5c5d3",
+          "surface-variant": "#dae2fd",
+          "primary": "#00236f",
+          "outline": "#757682",
+          "tertiary-container": "#5c3800",
+          "on-secondary": "#ffffff",
+          "on-primary-fixed-variant": "#264191",
+          "on-background": "#131b2e",
+          "surface-bright": "#faf8ff",
+          "surface-container-lowest": "#ffffff",
+          "surface-dim": "#d2d9f4",
+          "error-container": "#ffdad6",
+          "tertiary-fixed": "#ffddb8",
+          "on-secondary-container": "#006f64",
+          "surface": "#faf8ff",
+          "surface-container-highest": "#dae2fd",
+          "on-tertiary-fixed": "#2a1700",
+          "primary-container": "#1e3a8a",
+          "inverse-surface": "#283044",
+          "surface-tint": "#4059aa",
+          "on-error-container": "#93000a",
+          "on-primary-container": "#90a8ff",
+          "on-tertiary-container": "#ef9900",
+          "error": "#ba1a1a"
+        },
+        borderRadius: {
+          DEFAULT: "0.25rem", lg: "0.5rem", xl: "0.75rem", full: "9999px"
+        },
+        spacing: {
+          xs: "4px", base: "4px", sm: "8px", md: "12px",
+          xxl: "32px", "touch-target": "44px", xl: "24px", huge: "48px", lg: "16px"
+        },
+        fontFamily: {
+          "display-mobile": ["Inter"], h2: ["Inter"], body: ["Inter"],
+          display: ["Inter"], caption: ["Inter"], h1: ["Inter"]
+        },
+        fontSize: {
+          "display-mobile": ["24px", { lineHeight: "32px", fontWeight: "700" }],
+          h2: ["18px", { lineHeight: "24px", fontWeight: "600" }],
+          body: ["16px", { lineHeight: "24px", fontWeight: "400" }],
+          display: ["28px", { lineHeight: "36px", letterSpacing: "-0.02em", fontWeight: "700" }],
+          caption: ["13px", { lineHeight: "18px", fontWeight: "500" }],
+          h1: ["22px", { lineHeight: "28px", fontWeight: "600" }]
+        },
+        keyframes: {
+          "fade-up": {
+            "0%": { opacity: "0", transform: "translateY(16px)" },
+            "100%": { opacity: "1", transform: "translateY(0)" }
+          },
+          "scale-in": {
+            "0%": { opacity: "0", transform: "scale(0.96)" },
+            "100%": { opacity: "1", transform: "scale(1)" }
+          },
+          "slide-right": {
+            "0%": { opacity: "0", transform: "translateX(-12px)" },
+            "100%": { opacity: "1", transform: "translateX(0)" }
+          },
+          "pulse-dot": {
+            "0%, 100%": { transform: "scale(1)", opacity: "1" },
+            "50%": { transform: "scale(1.4)", opacity: "0.7" }
+          },
+          "shimmer": {
+            "0%": { backgroundPosition: "-200% 0" },
+            "100%": { backgroundPosition: "200% 0" }
+          }
+        },
+        animation: {
+          "fade-up": "fade-up 0.4s cubic-bezier(0.16,1,0.3,1) both",
+          "scale-in": "scale-in 0.35s cubic-bezier(0.16,1,0.3,1) both",
+          "slide-right": "slide-right 0.35s cubic-bezier(0.16,1,0.3,1) both",
+          "pulse-dot": "pulse-dot 2s ease-in-out infinite"
+        }
+      }
+    }
+  }
+</script>
+<style>
+  .material-symbols-outlined {
+    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+  }
+  body { background-color: #faf8ff; }
+
+  /* Toggle switch */
+  .toggle-track {
+    width: 44px; height: 24px;
+    background: #c5c5d3;
+    border-radius: 9999px;
+    position: relative;
+    cursor: pointer;
+    transition: background 0.25s cubic-bezier(0.4,0,0.2,1);
+  }
+  .toggle-track.on { background: #006b5f; }
+  .toggle-thumb {
+    position: absolute;
+    top: 3px; left: 3px;
+    width: 18px; height: 18px;
+    background: white;
+    border-radius: 9999px;
+    transition: transform 0.25s cubic-bezier(0.34,1.56,0.64,1),
+                box-shadow 0.2s;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.18);
+  }
+  .toggle-track.on .toggle-thumb {
+    transform: translateX(20px);
+    box-shadow: 0 1px 6px rgba(0,107,95,0.30);
+  }
+
+  /* Setting row hover */
+  .setting-row {
+    transition: background 0.18s ease, transform 0.18s ease;
+  }
+  .setting-row:hover { background: #f2f3ff; transform: translateX(2px); }
+  .setting-row:active { transform: scale(0.985); }
+
+  /* Section stagger animation */
+  .section-card { opacity: 0; }
+  .section-card.visible { animation: fade-up 0.45s cubic-bezier(0.16,1,0.3,1) forwards; }
+
+  @keyframes fade-up {
+    from { opacity: 0; transform: translateY(18px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Danger zone shimmer */
+  .danger-shimmer {
+    background: linear-gradient(90deg,
+      rgba(186,26,26,0.06) 25%,
+      rgba(186,26,26,0.13) 50%,
+      rgba(186,26,26,0.06) 75%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 3s linear infinite;
+  }
+  @keyframes shimmer {
+    0%   { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+  }
+
+  /* Active nav item */
+  .nav-active { background: #eaedff; color: #00236f; font-weight: 700; }
+
+  /* Smooth scroll */
+  html { scroll-behavior: smooth; }
+
+  /* Badge dot */
+  .badge-dot {
+    width: 8px; height: 8px;
+    background: #ba1a1a;
+    border-radius: 9999px;
+    animation: pulse-dot 2s ease-in-out infinite;
+  }
+  @keyframes pulse-dot {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50%       { transform: scale(1.4); opacity: 0.65; }
+  }
+
+  /* Avatar ring */
+  .avatar-ring {
+    box-shadow: 0 0 0 3px #dce1ff, 0 0 0 5px #b6c4ff;
+    transition: box-shadow 0.3s;
+  }
+  .avatar-ring:hover {
+    box-shadow: 0 0 0 3px #b6c4ff, 0 0 0 6px #4059aa44;
+  }
+</style>
+</head>
+<body class="font-body text-on-surface antialiased">
+
+<!-- ── SIDEBAR DESKTOP ────────────────────────────────────── -->
+<aside class="w-[280px] h-screen fixed left-0 top-0 bg-surface border-r border-outline-variant shadow-sm flex flex-col p-lg hidden md:flex z-40">
+  <div class="mb-xxl">
+    <h1 class="font-display text-display text-primary leading-none">ZDanger</h1>
+    <p class="font-caption text-caption text-on-surface-variant mt-1">Seguridad Ciudadana</p>
+  </div>
+  <nav class="flex-1 space-y-xs">
+    <a href="map_view.html"        class="setting-row flex items-center gap-md p-md rounded-xl text-on-surface-variant cursor-pointer">
+      <span class="material-symbols-outlined text-[22px]">map</span>
+      <span class="font-body text-body">Mapa</span>
+    </a>
+    <a href="reporte_incidencias.html" class="setting-row flex items-center gap-md p-md rounded-xl text-on-surface-variant cursor-pointer">
+      <span class="material-symbols-outlined text-[22px]">list_alt</span>
+      <span class="font-body text-body">Reportes</span>
+    </a>
+    <!-- AJUSTES ACTIVO -->
+    <a href="#" class="nav-active flex items-center gap-md p-md rounded-xl cursor-pointer border-l-4 border-primary">
+      <span class="material-symbols-outlined text-[22px]" style="font-variation-settings:'FILL' 1;">settings</span>
+      <span class="font-body text-body">Ajustes</span>
+    </a>
+    <a href="perfil.html" class="setting-row flex items-center gap-md p-md rounded-xl text-on-surface-variant cursor-pointer">
+      <span class="material-symbols-outlined text-[22px]">person</span>
+      <span class="font-body text-body">Mi Perfil</span>
+    </a>
+  </nav>
+  <!-- User chip -->
+  <div class="mt-auto p-md bg-surface-container-lowest rounded-xl flex items-center gap-md border border-outline-variant/50">
+    <img alt="User" class="w-10 h-10 rounded-full object-cover avatar-ring"
+         src="https://lh3.googleusercontent.com/aida-public/AB6AXuC_bIlNe6isOagqF2EmAo9dndMD06M_yxg2aBRoUmxdj2iFArVi5YQ2-nSHgAFvAQxBPWCjk3Tcn_YHhrKYRd0ecVV3p9He-UZt8-WkyJvE08PRO8N248ub3JrEWXlP8LFgtS0zgBPXzcZKhWly-ABkn1n4-QIfdVaO-WQNycAzPOSBJWqv4EDlVULU0HHXk1sdqwRth4Hl7nXxrU20waDt-DexUA8sHVVXPxlcm6pRsTyWZo0wccEWKSwiHEW34hxLic3Tv3qp_GE"/>
+    <div class="flex-1 min-w-0">
+      <p class="font-body text-body font-bold truncate">Carlos Mendoza</p>
+      <p class="font-caption text-caption text-on-surface-variant">Ciudadano Activo</p>
+    </div>
+  </div>
+</aside>
+
+<!-- ── HEADER DESKTOP ─────────────────────────────────────── -->
+<header class="flex justify-between items-center px-xl py-md md:ml-[280px] hidden md:flex bg-surface/90 backdrop-blur-sm border-b border-outline-variant sticky top-0 z-30">
+  <div class="flex items-center gap-sm">
+    <span class="material-symbols-outlined text-primary" style="font-variation-settings:'FILL' 1;">settings</span>
+    <h2 class="font-h1 text-h1 text-on-surface">Ajustes</h2>
+  </div>
+  <div class="flex items-center gap-xl">
+    <span class="font-caption text-caption text-on-surface-variant">Versión 1.0.0-beta</span>
+    <div class="relative">
+      <span class="material-symbols-outlined text-on-surface-variant cursor-pointer hover:text-primary transition-colors">notifications</span>
+      <span class="badge-dot absolute -top-0.5 -right-0.5"></span>
+    </div>
+    <img alt="User" class="w-8 h-8 rounded-full object-cover avatar-ring cursor-pointer"
+         src="https://lh3.googleusercontent.com/aida-public/AB6AXuC_bIlNe6isOagqF2EmAo9dndMD06M_yxg2aBRoUmxdj2iFArVi5YQ2-nSHgAFvAQxBPWCjk3Tcn_YHhrKYRd0ecVV3p9He-UZt8-WkyJvE08PRO8N248ub3JrEWXlP8LFgtS0zgBPXzcZKhWly-ABkn1n4-QIfdVaO-WQNycAzPOSBJWqv4EDlVULU0HHXk1sdqwRth4Hl7nXxrU20waDt-DexUA8sHVVXPxlcm6pRsTyWZo0wccEWKSwiHEW34hxLic3Tv3qp_GE"/>
+  </div>
+</header>
+
+<!-- ── MAIN CONTENT ───────────────────────────────────────── -->
+<main class="md:ml-[280px] p-lg md:p-xxl pb-[100px] md:pb-xxl max-w-4xl">
+
+  <!-- Mobile Header -->
+  <div class="md:hidden mb-xl flex items-center gap-sm">
+    <span class="material-symbols-outlined text-primary text-[28px]" style="font-variation-settings:'FILL' 1;">settings</span>
+    <h2 class="font-display-mobile text-display-mobile text-on-surface">Ajustes</h2>
+  </div>
+
+  <div class="space-y-xl" id="settings-container">
+
+    <!-- ── 1. CUENTA ─────────────────────────────────────── -->
+    <section class="section-card bg-white rounded-2xl border border-outline-variant shadow-[0_2px_12px_rgba(19,27,46,0.06)] overflow-hidden">
+      <!-- Section Header -->
+      <div class="flex items-center gap-md px-xl py-lg border-b border-outline-variant/60 bg-gradient-to-r from-surface-container-low to-white">
+        <div class="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center">
+          <span class="material-symbols-outlined text-primary text-[20px]" style="font-variation-settings:'FILL' 1;">manage_accounts</span>
+        </div>
+        <div>
+          <h3 class="font-h2 text-h2 text-on-surface">Cuenta</h3>
+          <p class="font-caption text-caption text-on-surface-variant">Información personal y verificación</p>
+        </div>
+      </div>
+      <!-- Rows -->
+      <div class="divide-y divide-outline-variant/40">
+        <div class="setting-row flex items-center justify-between px-xl py-lg cursor-pointer rounded-none">
+          <div class="flex items-center gap-md">
+            <span class="material-symbols-outlined text-on-surface-variant text-[20px]">badge</span>
+            <div>
+              <p class="font-body text-body font-medium">Nombre completo</p>
+              <p class="font-caption text-caption text-on-surface-variant">Carlos Mendoza</p>
+            </div>
+          </div>
+          <span class="material-symbols-outlined text-outline text-[18px]">chevron_right</span>
+        </div>
+        <div class="setting-row flex items-center justify-between px-xl py-lg cursor-pointer rounded-none">
+          <div class="flex items-center gap-md">
+            <span class="material-symbols-outlined text-on-surface-variant text-[20px]">mail</span>
+            <div>
+              <p class="font-body text-body font-medium">Correo electrónico</p>
+              <p class="font-caption text-caption text-on-surface-variant">carlos@ejemplo.com</p>
+            </div>
+          </div>
+          <span class="material-symbols-outlined text-outline text-[18px]">chevron_right</span>
+        </div>
+        <div class="setting-row flex items-center justify-between px-xl py-lg cursor-pointer rounded-none">
+          <div class="flex items-center gap-md">
+            <span class="material-symbols-outlined text-on-surface-variant text-[20px]">smartphone</span>
+            <div>
+              <p class="font-body text-body font-medium">Teléfono</p>
+              <p class="font-caption text-caption text-secondary font-semibold">Verificar número →</p>
+            </div>
+          </div>
+          <span class="bg-error-container text-on-error-container text-[11px] font-bold px-sm py-xs rounded-full uppercase tracking-wide">Pendiente</span>
+        </div>
+        <div class="setting-row flex items-center justify-between px-xl py-lg cursor-pointer rounded-none">
+          <div class="flex items-center gap-md">
+            <span class="material-symbols-outlined text-on-surface-variant text-[20px]">lock</span>
+            <div>
+              <p class="font-body text-body font-medium">Contraseña</p>
+              <p class="font-caption text-caption text-on-surface-variant">Última cambio hace 30 días</p>
+            </div>
+          </div>
+          <span class="material-symbols-outlined text-outline text-[18px]">chevron_right</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── 2. NOTIFICACIONES ──────────────────────────────── -->
+    <section class="section-card bg-white rounded-2xl border border-outline-variant shadow-[0_2px_12px_rgba(19,27,46,0.06)] overflow-hidden">
+      <div class="flex items-center gap-md px-xl py-lg border-b border-outline-variant/60 bg-gradient-to-r from-secondary-fixed/20 to-white">
+        <div class="w-9 h-9 rounded-xl bg-secondary/10 flex items-center justify-center">
+          <span class="material-symbols-outlined text-secondary text-[20px]" style="font-variation-settings:'FILL' 1;">notifications_active</span>
+        </div>
+        <div>
+          <h3 class="font-h2 text-h2 text-on-surface">Notificaciones</h3>
+          <p class="font-caption text-caption text-on-surface-variant">Cuándo y cómo te avisamos</p>
+        </div>
+      </div>
+      <div class="divide-y divide-outline-variant/40">
+        <!-- Toggle rows -->
+        <div class="flex items-center justify-between px-xl py-lg">
+          <div class="flex items-center gap-md">
+            <span class="material-symbols-outlined text-on-surface-variant text-[20px]">near_me</span>
+            <div>
+              <p class="font-body text-body font-medium">Alertas cercanas</p>
+              <p class="font-caption text-caption text-on-surface-variant">Incidentes a menos de 500m</p>
+            </div>
+          </div>
+          <div class="toggle-track on" onclick="toggleSwitch(this)"><div class="toggle-thumb"></div></div>
+        </div>
+        <div class="flex items-center justify-between px-xl py-lg">
+          <div class="flex items-center gap-md">
+            <span class="material-symbols-outlined text-on-surface-variant text-[20px]">verified</span>
+            <div>
+              <p class="font-body text-body font-medium">Validaciones</p>
+              <p class="font-caption text-caption text-on-surface-variant">Cuando validan tus reportes</p>
+            </div>
+          </div>
+          <div class="toggle-track on" onclick="toggleSwitch(this)"><div class="toggle-thumb"></div></div>
+        </div>
+        <div class="flex items-center justify-between px-xl py-lg">
+          <div class="flex items-center gap-md">
+            <span class="material-symbols-outlined text-on-surface-variant text-[20px]">trending_up</span>
+            <div>
+              <p class="font-body text-body font-medium">Resumen semanal</p>
+              <p class="font-caption text-caption text-on-surface-variant">Estadísticas de tu zona</p>
+            </div>
+          </div>
+          <div class="toggle-track" onclick="toggleSwitch(this)"><div class="toggle-thumb"></div></div>
+        </div>
+        <div class="flex items-center justify-between px-xl py-lg">
+          <div class="flex items-center gap-md">
+            <span class="material-symbols-outlined text-on-surface-variant text-[20px]">campaign</span>
+            <div>
+              <p class="font-body text-body font-medium">Comunicados oficiales</p>
+              <p class="font-caption text-caption text-on-surface-variant">Mensajes de las autoridades</p>
+            </div>
+          </div>
+          <div class="toggle-track on" onclick="toggleSwitch(this)"><div class="toggle-thumb"></div></div>
+        </div>
+        <!-- Radio: sound -->
+        <div class="px-xl py-lg">
+          <div class="flex items-center gap-md mb-md">
+            <span class="material-symbols-outlined text-on-surface-variant text-[20px]">volume_up</span>
+            <p class="font-body text-body font-medium">Sonido de alertas</p>
+          </div>
+          <div class="flex gap-sm flex-wrap" id="sound-group">
+            <button onclick="selectChip(this,'sound-group')" data-active="true"
+              class="chip-btn px-lg py-sm rounded-full text-caption font-caption font-semibold border transition-all duration-200
+                     bg-primary text-on-primary border-primary active:scale-95">
+              Activado
+            </button>
+            <button onclick="selectChip(this,'sound-group')"
+              class="chip-btn px-lg py-sm rounded-full text-caption font-caption font-semibold border transition-all duration-200
+                     bg-surface text-on-surface-variant border-outline-variant hover:bg-surface-container active:scale-95">
+              Solo vibración
+            </button>
+            <button onclick="selectChip(this,'sound-group')"
+              class="chip-btn px-lg py-sm rounded-full text-caption font-caption font-semibold border transition-all duration-200
+                     bg-surface text-on-surface-variant border-outline-variant hover:bg-surface-container active:scale-95">
+              Silencioso
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── 3. PRIVACIDAD ──────────────────────────────────── -->
+    <section class="section-card bg-white rounded-2xl border border-outline-variant shadow-[0_2px_12px_rgba(19,27,46,0.06)] overflow-hidden">
+      <div class="flex items-center gap-md px-xl py-lg border-b border-outline-variant/60 bg-gradient-to-r from-primary-fixed/30 to-white">
+        <div class="w-9 h-9 rounded-xl bg-primary-container/20 flex items-center justify-center">
+          <span class="material-symbols-outlined text-primary-container text-[20px]" style="font-variation-settings:'FILL' 1; color:#264191;">shield</span>
+        </div>
+        <div>
+          <h3 class="font-h2 text-h2 text-on-surface">Privacidad</h3>
+          <p class="font-caption text-caption text-on-surface-variant">Control de tus datos</p>
+        </div>
+      </div>
+      <div class="divide-y divide-outline-variant/40">
+        <div class="flex items-center justify-between px-xl py-lg">
+          <div class="flex items-center gap-md">
+            <span class="material-symbols-outlined text-on-surface-variant text-[20px]">visibility_off</span>
+            <div>
+              <p class="font-body text-body font-medium">Reportar anónimamente</p>
+              <p class="font-caption text-caption text-on-surface-variant">Tu nombre no aparece en reportes</p>
+            </div>
+          </div>
+          <div class="toggle-track" onclick="toggleSwitch(this)"><div class="toggle-thumb"></div></div>
+        </div>
+        <div class="flex items-center justify-between px-xl py-lg">
+          <div class="flex items-center gap-md">
+            <span class="material-symbols-outlined text-on-surface-variant text-[20px]">location_on</span>
+            <div>
+              <p class="font-body text-body font-medium">Compartir ubicación exacta</p>
+              <p class="font-caption text-caption text-on-surface-variant">Para reportes más precisos</p>
+            </div>
+          </div>
+          <div class="toggle-track on" onclick="toggleSwitch(this)"><div class="toggle-thumb"></div></div>
+        </div>
+        <div class="flex items-center justify-between px-xl py-lg">
+          <div class="flex items-center gap-md">
+            <span class="material-symbols-outlined text-on-surface-variant text-[20px]">analytics</span>
+            <div>
+              <p class="font-body text-body font-medium">Datos de uso anónimos</p>
+              <p class="font-caption text-caption text-on-surface-variant">Ayudanos a mejorar la app</p>
+            </div>
+          </div>
+          <div class="toggle-track on" onclick="toggleSwitch(this)"><div class="toggle-thumb"></div></div>
+        </div>
+        <div class="setting-row flex items-center justify-between px-xl py-lg cursor-pointer rounded-none">
+          <div class="flex items-center gap-md">
+            <span class="material-symbols-outlined text-on-surface-variant text-[20px]">download</span>
+            <div>
+              <p class="font-body text-body font-medium">Exportar mis datos</p>
+              <p class="font-caption text-caption text-on-surface-variant">Descargá un resumen de tu actividad</p>
+            </div>
+          </div>
+          <span class="material-symbols-outlined text-outline text-[18px]">chevron_right</span>
+        </div>
+        <div class="setting-row flex items-center justify-between px-xl py-lg cursor-pointer rounded-none">
+          <div class="flex items-center gap-md">
+            <span class="material-symbols-outlined text-on-surface-variant text-[20px]">policy</span>
+            <div>
+              <p class="font-body text-body font-medium">Aviso de privacidad</p>
+              <p class="font-caption text-caption text-on-surface-variant">Ver términos completos</p>
+            </div>
+          </div>
+          <span class="material-symbols-outlined text-outline text-[18px]">open_in_new</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── 4. APARIENCIA ──────────────────────────────────── -->
+    <section class="section-card bg-white rounded-2xl border border-outline-variant shadow-[0_2px_12px_rgba(19,27,46,0.06)] overflow-hidden">
+      <div class="flex items-center gap-md px-xl py-lg border-b border-outline-variant/60 bg-gradient-to-r from-tertiary-fixed/30 to-white">
+        <div class="w-9 h-9 rounded-xl bg-tertiary-fixed/50 flex items-center justify-center">
+          <span class="material-symbols-outlined text-[20px]" style="color:#653e00; font-variation-settings:'FILL' 1;">palette</span>
+        </div>
+        <div>
+          <h3 class="font-h2 text-h2 text-on-surface">Apariencia</h3>
+          <p class="font-caption text-caption text-on-surface-variant">Tema y personalización visual</p>
+        </div>
+      </div>
+      <div class="divide-y divide-outline-variant/40">
+        <!-- Theme selector -->
+        <div class="px-xl py-lg">
+          <div class="flex items-center gap-md mb-md">
+            <span class="material-symbols-outlined text-on-surface-variant text-[20px]">dark_mode</span>
+            <p class="font-body text-body font-medium">Tema de la interfaz</p>
+          </div>
+          <div class="flex gap-sm" id="theme-group">
+            <button onclick="selectChip(this,'theme-group')"
+              class="chip-btn flex items-center gap-sm px-lg py-sm rounded-full text-caption font-caption font-semibold border transition-all duration-200
+                     bg-surface text-on-surface-variant border-outline-variant hover:bg-surface-container active:scale-95">
+              <span class="material-symbols-outlined text-[16px]">light_mode</span> Claro
+            </button>
+            <button onclick="selectChip(this,'theme-group')"
+              class="chip-btn flex items-center gap-sm px-lg py-sm rounded-full text-caption font-caption font-semibold border transition-all duration-200
+                     bg-surface text-on-surface-variant border-outline-variant hover:bg-surface-container active:scale-95">
+              <span class="material-symbols-outlined text-[16px]">dark_mode</span> Oscuro
+            </button>
+            <button onclick="selectChip(this,'theme-group')" data-active="true"
+              class="chip-btn flex items-center gap-sm px-lg py-sm rounded-full text-caption font-caption font-semibold border transition-all duration-200
+                     bg-primary text-on-primary border-primary active:scale-95">
+              <span class="material-symbols-outlined text-[16px]">brightness_auto</span> Auto
+            </button>
+          </div>
+        </div>
+        <!-- Map style -->
+        <div class="px-xl py-lg">
+          <div class="flex items-center gap-md mb-md">
+            <span class="material-symbols-outlined text-on-surface-variant text-[20px]">map</span>
+            <p class="font-body text-body font-medium">Estilo de mapa</p>
+          </div>
+          <div class="grid grid-cols-3 gap-sm" id="map-group">
+            <button onclick="selectCard(this,'map-group')" data-active="true"
+              class="map-card rounded-xl border-2 border-primary p-sm flex flex-col items-center gap-xs transition-all duration-200 hover:shadow-md active:scale-95">
+              <div class="w-full h-12 rounded-lg bg-gradient-to-br from-[#e8f4fd] to-[#c8e6c9] flex items-center justify-center">
+                <span class="material-symbols-outlined text-[18px] text-[#2e7d32]">terrain</span>
+              </div>
+              <span class="font-caption text-caption text-primary font-semibold">Estándar</span>
+            </button>
+            <button onclick="selectCard(this,'map-group')"
+              class="map-card rounded-xl border-2 border-outline-variant p-sm flex flex-col items-center gap-xs transition-all duration-200 hover:shadow-md active:scale-95">
+              <div class="w-full h-12 rounded-lg bg-gradient-to-br from-[#1a1a2e] to-[#16213e] flex items-center justify-center">
+                <span class="material-symbols-outlined text-[18px] text-[#e0e0ff]">nightlight</span>
+              </div>
+              <span class="font-caption text-caption text-on-surface-variant font-semibold">Nocturno</span>
+            </button>
+            <button onclick="selectCard(this,'map-group')"
+              class="map-card rounded-xl border-2 border-outline-variant p-sm flex flex-col items-center gap-xs transition-all duration-200 hover:shadow-md active:scale-95">
+              <div class="w-full h-12 rounded-lg bg-gradient-to-br from-[#f5f5f5] to-[#e0e0e0] flex items-center justify-center">
+                <span class="material-symbols-outlined text-[18px] text-[#555]">filter_b_and_w</span>
+              </div>
+              <span class="font-caption text-caption text-on-surface-variant font-semibold">Sin color</span>
+            </button>
+          </div>
+        </div>
+        <!-- Text size -->
+        <div class="px-xl py-lg">
+          <div class="flex items-center justify-between mb-md">
+            <div class="flex items-center gap-md">
+              <span class="material-symbols-outlined text-on-surface-variant text-[20px]">text_fields</span>
+              <p class="font-body text-body font-medium">Tamaño de texto</p>
+            </div>
+            <span class="font-caption text-caption text-primary font-semibold" id="font-size-label">Normal</span>
+          </div>
+          <input type="range" min="1" max="3" value="2" step="1"
+            class="w-full h-1.5 rounded-full appearance-none cursor-pointer accent-primary"
+            oninput="updateFontLabel(this.value)" />
+          <div class="flex justify-between mt-xs">
+            <span class="font-caption text-caption text-outline text-[11px]">Pequeño</span>
+            <span class="font-caption text-caption text-outline text-[11px]">Grande</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── 5. ZONAS DE ALERTA ─────────────────────────────── -->
+    <section class="section-card bg-white rounded-2xl border border-outline-variant shadow-[0_2px_12px_rgba(19,27,46,0.06)] overflow-hidden">
+      <div class="flex items-center justify-between px-xl py-lg border-b border-outline-variant/60 bg-gradient-to-r from-secondary-container/20 to-white">
+        <div class="flex items-center gap-md">
+          <div class="w-9 h-9 rounded-xl bg-secondary/10 flex items-center justify-center">
+            <span class="material-symbols-outlined text-secondary text-[20px]" style="font-variation-settings:'FILL' 1;">add_location_alt</span>
+          </div>
+          <div>
+            <h3 class="font-h2 text-h2 text-on-surface">Zonas de alerta</h3>
+            <p class="font-caption text-caption text-on-surface-variant">3 zonas configuradas</p>
+          </div>
+        </div>
+        <button class="flex items-center gap-xs px-md py-sm rounded-xl bg-secondary text-on-secondary font-caption text-caption font-semibold transition-all hover:bg-secondary/90 active:scale-95">
+          <span class="material-symbols-outlined text-[16px]">add</span> Nueva
+        </button>
+      </div>
+      <div class="divide-y divide-outline-variant/40">
+        <!-- Zone cards -->
+        <div class="flex items-center justify-between px-xl py-lg group">
+          <div class="flex items-center gap-md">
+            <div class="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
+              <span class="material-symbols-outlined text-primary text-[20px]" style="font-variation-settings:'FILL' 1;">home</span>
+            </div>
+            <div>
+              <p class="font-body text-body font-medium">Casa</p>
+              <p class="font-caption text-caption text-on-surface-variant">Calle 72 #13-54, Chapinero · 500m</p>
+            </div>
+          </div>
+          <div class="flex items-center gap-sm opacity-0 group-hover:opacity-100 transition-opacity">
+            <span class="material-symbols-outlined text-outline text-[20px] cursor-pointer hover:text-primary transition-colors">edit</span>
+            <span class="material-symbols-outlined text-outline text-[20px] cursor-pointer hover:text-error transition-colors">delete</span>
+          </div>
+        </div>
+        <div class="flex items-center justify-between px-xl py-lg group">
+          <div class="flex items-center gap-md">
+            <div class="w-10 h-10 rounded-xl bg-secondary/10 flex items-center justify-center group-hover:bg-secondary/20 transition-colors">
+              <span class="material-symbols-outlined text-secondary text-[20px]" style="font-variation-settings:'FILL' 1;">work</span>
+            </div>
+            <div>
+              <p class="font-body text-body font-medium">Trabajo</p>
+              <p class="font-caption text-caption text-on-surface-variant">Carrera 15 con Calle 94 · 300m</p>
+            </div>
+          </div>
+          <div class="flex items-center gap-sm opacity-0 group-hover:opacity-100 transition-opacity">
+            <span class="material-symbols-outlined text-outline text-[20px] cursor-pointer hover:text-primary transition-colors">edit</span>
+            <span class="material-symbols-outlined text-outline text-[20px] cursor-pointer hover:text-error transition-colors">delete</span>
+          </div>
+        </div>
+        <div class="flex items-center justify-between px-xl py-lg group">
+          <div class="flex items-center gap-md">
+            <div class="w-10 h-10 rounded-xl bg-tertiary-fixed/60 flex items-center justify-center group-hover:bg-tertiary-fixed transition-colors">
+              <span class="material-symbols-outlined text-[20px]" style="color:#653e00; font-variation-settings:'FILL' 1;">school</span>
+            </div>
+            <div>
+              <p class="font-body text-body font-medium">Universidad</p>
+              <p class="font-caption text-caption text-on-surface-variant">Calle 45 #26-85, Teusaquillo · 800m</p>
+            </div>
+          </div>
+          <div class="flex items-center gap-sm opacity-0 group-hover:opacity-100 transition-opacity">
+            <span class="material-symbols-outlined text-outline text-[20px] cursor-pointer hover:text-primary transition-colors">edit</span>
+            <span class="material-symbols-outlined text-outline text-[20px] cursor-pointer hover:text-error transition-colors">delete</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── 6. ZONA DE PELIGRO ──────────────────────────────── -->
+    <section class="section-card rounded-2xl border border-error/20 overflow-hidden danger-shimmer">
+      <div class="flex items-center gap-md px-xl py-lg border-b border-error/20 bg-error-container/30">
+        <div class="w-9 h-9 rounded-xl bg-error/10 flex items-center justify-center">
+          <span class="material-symbols-outlined text-error text-[20px]" style="font-variation-settings:'FILL' 1;">warning</span>
+        </div>
+        <div>
+          <h3 class="font-h2 text-h2 text-error">Zona de peligro</h3>
+          <p class="font-caption text-caption text-on-error-container">Acciones irreversibles</p>
+        </div>
+      </div>
+      <div class="bg-white/80 divide-y divide-error/10">
+        <div class="setting-row flex items-center justify-between px-xl py-lg cursor-pointer rounded-none">
+          <div class="flex items-center gap-md">
+            <span class="material-symbols-outlined text-error/70 text-[20px]">logout</span>
+            <div>
+              <p class="font-body text-body font-medium text-on-surface">Cerrar sesión</p>
+              <p class="font-caption text-caption text-on-surface-variant">Salir de esta cuenta</p>
+            </div>
+          </div>
+          <span class="material-symbols-outlined text-outline text-[18px]">chevron_right</span>
+        </div>
+        <div class="setting-row flex items-center justify-between px-xl py-lg cursor-pointer rounded-none" onclick="openDeleteModal()">
+          <div class="flex items-center gap-md">
+            <span class="material-symbols-outlined text-error text-[20px]">delete_forever</span>
+            <div>
+              <p class="font-body text-body font-medium text-error">Eliminar mi cuenta</p>
+              <p class="font-caption text-caption text-on-surface-variant">Borra permanentemente todos tus datos</p>
+            </div>
+          </div>
+          <span class="material-symbols-outlined text-error/50 text-[18px]">chevron_right</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- App info -->
+    <div class="text-center pb-xl">
+      <p class="font-caption text-caption text-outline">ZDanger v1.0.0-beta · Hecho con ❤️ en Colombia</p>
+      <p class="font-caption text-caption text-outline mt-xs">© 2026 ZDanger. Todos los derechos reservados.</p>
+    </div>
+
+  </div><!-- /settings-container -->
+</main>
+
+<!-- ── BOTTOM NAV MOBILE ───────────────────────────────────── -->
+<nav class="fixed bottom-0 left-0 w-full flex justify-around items-center px-4 pb-safe h-[72px] md:hidden bg-surface/90 backdrop-blur-md border-t border-outline-variant z-50">
+  <a href="map_view.html" class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1 active:scale-90 transition-all duration-200">
+    <span class="material-symbols-outlined">map</span>
+    <span class="font-caption text-caption">Mapa</span>
+  </a>
+  <a href="reporte_incidencias.html" class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1 active:scale-90 transition-all duration-200">
+    <span class="material-symbols-outlined">assignment</span>
+    <span class="font-caption text-caption">Mis reportes</span>
+  </a>
+  <a href="#" class="flex flex-col items-center justify-center bg-primary/10 text-primary rounded-2xl px-4 py-1 active:scale-90 transition-all duration-200">
+    <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1;">settings</span>
+    <span class="font-caption text-caption font-bold">Ajustes</span>
+  </a>
+  <a href="perfil.html" class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1 active:scale-90 transition-all duration-200">
+    <span class="material-symbols-outlined">person</span>
+    <span class="font-caption text-caption">Perfil</span>
+  </a>
+</nav>
+
+<!-- ── DELETE MODAL ───────────────────────────────────────── -->
+<div id="delete-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-xl">
+  <div class="absolute inset-0 bg-on-surface/40 backdrop-blur-sm" onclick="closeDeleteModal()"></div>
+  <div class="relative bg-white rounded-2xl shadow-2xl max-w-sm w-full p-xl animate-scale-in border border-error/20">
+    <div class="flex flex-col items-center text-center mb-xl">
+      <div class="w-16 h-16 rounded-full bg-error-container flex items-center justify-center mb-md">
+        <span class="material-symbols-outlined text-error text-[32px]" style="font-variation-settings:'FILL' 1;">delete_forever</span>
+      </div>
+      <h3 class="font-h1 text-h1 text-on-surface mb-sm">¿Eliminar cuenta?</h3>
+      <p class="font-body text-body text-on-surface-variant">Esta acción es <strong>permanente e irreversible</strong>. Perderás todos tus reportes, tu reputación y tu historial.</p>
+    </div>
+    <div class="space-y-sm">
+      <button onclick="closeDeleteModal()"
+        class="w-full py-md rounded-xl bg-primary text-on-primary font-bold font-body transition-all active:scale-95 hover:bg-primary/90">
+        Cancelar, mantener cuenta
+      </button>
+      <button
+        class="w-full py-md rounded-xl border border-error text-error font-bold font-body transition-all active:scale-95 hover:bg-error-container/20">
+        Sí, eliminar todo
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+  // ── Toggle switches ──────────────────────────────────────
+  function toggleSwitch(el) {
+    el.classList.toggle('on');
+    el.querySelector('.toggle-thumb').style.transform =
+      el.classList.contains('on') ? 'translateX(20px)' : '';
+  }
+
+  // ── Chip selector ─────────────────────────────────────────
+  function selectChip(btn, groupId) {
+    document.querySelectorAll(`#${groupId} .chip-btn`).forEach(b => {
+      b.classList.remove('bg-primary','text-on-primary','border-primary');
+      b.classList.add('bg-surface','text-on-surface-variant','border-outline-variant');
+    });
+    btn.classList.remove('bg-surface','text-on-surface-variant','border-outline-variant');
+    btn.classList.add('bg-primary','text-on-primary','border-primary');
+  }
+
+  // ── Map card selector ─────────────────────────────────────
+  function selectCard(btn, groupId) {
+    document.querySelectorAll(`#${groupId} .map-card`).forEach(b => {
+      b.classList.remove('border-primary');
+      b.classList.add('border-outline-variant');
+      b.querySelector('span').classList.remove('text-primary');
+      b.querySelector('span').classList.add('text-on-surface-variant');
+    });
+    btn.classList.remove('border-outline-variant');
+    btn.classList.add('border-primary');
+    btn.querySelector('span').classList.remove('text-on-surface-variant');
+    btn.querySelector('span').classList.add('text-primary');
+  }
+
+  // ── Font size label ───────────────────────────────────────
+  function updateFontLabel(v) {
+    const labels = { 1: 'Pequeño', 2: 'Normal', 3: 'Grande' };
+    document.getElementById('font-size-label').textContent = labels[v];
+  }
+
+  // ── Delete modal ──────────────────────────────────────────
+  function openDeleteModal() {
+    const m = document.getElementById('delete-modal');
+    m.classList.remove('hidden');
+    m.classList.add('flex');
+  }
+  function closeDeleteModal() {
+    const m = document.getElementById('delete-modal');
+    m.classList.add('hidden');
+    m.classList.remove('flex');
+  }
+
+  // ── Staggered entrance animation ─────────────────────────
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((e, i) => {
+      if (e.isIntersecting) {
+        setTimeout(() => e.target.classList.add('visible'), i * 80);
+        observer.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.08 });
+
+  document.querySelectorAll('.section-card').forEach(c => observer.observe(c));
+
+  // ── Card hover shadow ─────────────────────────────────────
+  document.querySelectorAll('section.section-card').forEach(card => {
+    card.addEventListener('mouseenter', () => {
+      card.style.boxShadow = '0 8px 28px rgba(19,27,46,0.10)';
+      card.style.transform = 'translateY(-1px)';
+      card.style.transition = 'box-shadow 0.22s ease, transform 0.22s ease';
+    });
+    card.addEventListener('mouseleave', () => {
+      card.style.boxShadow = '';
+      card.style.transform = '';
+    });
+  });
+</script>
+</body>
+</html>

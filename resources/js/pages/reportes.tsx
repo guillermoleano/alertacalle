@@ -1,36 +1,191 @@
 import { Head } from '@inertiajs/react';
+import { ArrowDownUp, Search, Shield, ShieldAlert, ShieldCheck, X } from 'lucide-react';
+import { useState } from 'react';
 import { AppFrame } from '@/components/alertacalle/app-frame';
 import { ReportCard } from '@/components/alertacalle/report-card';
-import { demoReports } from '@/data/demo-reports';
+import { demoReports, incidentTypes } from '@/data/demo-reports';
+import { useStagger } from '@/hooks/use-stagger';
+import { cn } from '@/lib/utils';
+
+type StatusFilter = 'Todos' | 'Alto' | 'Medio' | 'Bajo';
+type SortOption   = 'reciente' | 'confianza' | 'riesgo';
+
+const statusTabs: { value: StatusFilter; label: string; icon: React.ElementType; color: string }[] = [
+    { value: 'Todos',  label: 'Todos',  icon: Shield,      color: 'text-[var(--ac-primary)]'  },
+    { value: 'Alto',   label: 'Alto',   icon: ShieldAlert, color: 'text-red-600'               },
+    { value: 'Medio',  label: 'Medio',  icon: ShieldCheck, color: 'text-amber-600'             },
+    { value: 'Bajo',   label: 'Bajo',   icon: ShieldCheck, color: 'text-emerald-600'           },
+];
+
+const sortLabels: Record<SortOption, string> = {
+    reciente:  'Más recientes',
+    confianza: 'Mayor confianza',
+    riesgo:    'Mayor riesgo',
+};
+
+const riskOrder = { Alto: 3, Medio: 2, Bajo: 1 };
 
 export default function Reportes() {
+    const [search,  setSearch]  = useState('');
+    const [status,  setStatus]  = useState<StatusFilter>('Todos');
+    const [type,    setType]    = useState('Todos');
+    const [sort,    setSort]    = useState<SortOption>('reciente');
+    const gridRef = useStagger<HTMLDivElement>(70, 50);
+
+    const allTypes = ['Todos', ...incidentTypes];
+
+    const filtered = demoReports
+        .filter(r => {
+            const matchStatus = status === 'Todos' || r.risk === status;
+            const matchType   = type   === 'Todos' || r.type === type;
+            const matchSearch = search === '' ||
+                r.title.toLowerCase().includes(search.toLowerCase()) ||
+                r.location.toLowerCase().includes(search.toLowerCase());
+            return matchStatus && matchType && matchSearch;
+        })
+        .sort((a, b) => {
+            if (sort === 'confianza') return b.trustScore - a.trustScore;
+            if (sort === 'riesgo')   return riskOrder[b.risk] - riskOrder[a.risk];
+            return 0; // reciente: orden original
+        });
+
+    const total = demoReports.length;
+    const alto  = demoReports.filter(r => r.risk === 'Alto').length;
+    const medio = demoReports.filter(r => r.risk === 'Medio').length;
+    const bajo  = demoReports.filter(r => r.risk === 'Bajo').length;
+
     return (
         <AppFrame>
             <Head title="Reportes" />
 
-            <section className="px-4 py-8 md:px-8">
+            <section className="px-4 py-6 md:px-8">
                 <div className="mx-auto max-w-6xl">
-                    <div className="mb-6 flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
-                        <div>
-                            <p className="text-sm font-bold tracking-wide text-[var(--ac-secondary)] uppercase">
-                                Actividad comunitaria
-                            </p>
-                            <h1 className="mt-2 text-3xl font-bold text-[var(--ac-primary)]">
-                                Reportes
-                            </h1>
-                        </div>
-                        <p className="max-w-xl text-sm leading-6 text-[var(--ac-on-surface-variant)]">
-                            Listado inicial de reportes activos. La conexión a
-                            datos reales quedará sobre `ReportController` y
-                            recursos JSON seguros.
+
+                    {/* ── header ── */}
+                    <div className="mb-6">
+                        <p className="text-[11px] font-bold uppercase tracking-widest text-[var(--ac-secondary)]">
+                            Actividad comunitaria
                         </p>
+                        <h1 className="mt-1 text-2xl font-bold text-[var(--ac-primary)]">Reportes</h1>
                     </div>
 
-                    <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-                        {demoReports.map((report) => (
-                            <ReportCard key={report.id} report={report} />
+                    {/* ── stats ── */}
+                    <div className="mb-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
+                        {[
+                            { label: 'Total', value: total, bg: 'bg-[var(--ac-primary-fixed)]/40', text: 'text-[var(--ac-primary)]' },
+                            { label: 'Alto riesgo', value: alto, bg: 'bg-red-500/10', text: 'text-red-500' },
+                            { label: 'Riesgo medio', value: medio, bg: 'bg-amber-500/10', text: 'text-amber-500' },
+                            { label: 'Bajo riesgo', value: bajo, bg: 'bg-emerald-500/10', text: 'text-emerald-500' },
+                        ].map(s => (
+                            <div key={s.label} className={cn('rounded-2xl px-4 py-3', s.bg)}>
+                                <p className={cn('text-3xl font-bold', s.text)}>{s.value}</p>
+                                <p className="mt-0.5 text-[12px] font-medium text-[var(--ac-on-surface-variant)]">{s.label}</p>
+                            </div>
                         ))}
                     </div>
+
+                    {/* ── search + sort ── */}
+                    <div className="mb-4 flex flex-col gap-3 sm:flex-row">
+                        <label className="relative flex-1">
+                            <Search className="pointer-events-none absolute top-1/2 left-3.5 size-4 -translate-y-1/2 text-[var(--ac-on-surface-variant)]" />
+                            <input
+                                value={search}
+                                onChange={e => setSearch(e.target.value)}
+                                className="min-h-11 w-full rounded-xl border border-[var(--ac-outline-variant)] bg-[var(--ac-surface-container-lowest)] text-[var(--ac-on-surface)] pr-4 pl-10 text-sm outline-none transition-shadow focus:ring-2 focus:ring-[var(--ac-primary)]"
+                                placeholder="Buscar por título o ubicación…"
+                            />
+                            {search && (
+                                <button onClick={() => setSearch('')} className="absolute top-1/2 right-3 -translate-y-1/2 text-[var(--ac-outline)] hover:text-[var(--ac-on-surface)]">
+                                    <X className="size-4" />
+                                </button>
+                            )}
+                        </label>
+
+                        {/* sort selector */}
+                        <div className="relative">
+                            <ArrowDownUp className="pointer-events-none absolute top-1/2 left-3.5 size-4 -translate-y-1/2 text-[var(--ac-on-surface-variant)]" />
+                            <select
+                                value={sort}
+                                onChange={e => setSort(e.target.value as SortOption)}
+                                className="min-h-11 appearance-none rounded-xl border border-[var(--ac-outline-variant)] bg-[var(--ac-surface-container-lowest)] pl-10 pr-8 text-sm font-semibold text-[var(--ac-on-surface)] outline-none focus:ring-2 focus:ring-[var(--ac-primary)]"
+                            >
+                                {(Object.keys(sortLabels) as SortOption[]).map(k => (
+                                    <option key={k} value={k}>{sortLabels[k]}</option>
+                                ))}
+                            </select>
+                        </div>
+                    </div>
+
+                    {/* ── status tabs ── */}
+                    <div className="mb-4 flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none]">
+                        {statusTabs.map(tab => {
+                            const Icon = tab.icon;
+                            return (
+                                <button
+                                    key={tab.value}
+                                    type="button"
+                                    onClick={() => setStatus(tab.value)}
+                                    className={cn(
+                                        'inline-flex min-h-9 shrink-0 items-center gap-1.5 rounded-full px-4 text-[13px] font-semibold transition-all active:scale-95',
+                                        status === tab.value
+                                            ? 'bg-[var(--ac-primary)] text-white shadow-sm'
+                                            : 'border border-[var(--ac-outline-variant)] bg-[var(--ac-surface-container-lowest)] text-[var(--ac-on-surface-variant)] hover:bg-[var(--ac-surface-container)]',
+                                    )}
+                                >
+                                    <Icon className={cn('size-3.5', status === tab.value ? 'text-white' : tab.color)} />
+                                    {tab.label}
+                                </button>
+                            );
+                        })}
+                    </div>
+
+                    {/* ── type chips ── */}
+                    <div className="mb-5 flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none]">
+                        {['Todos', ...incidentTypes].map(t => (
+                            <button
+                                key={t}
+                                type="button"
+                                onClick={() => setType(t)}
+                                className={cn(
+                                    'min-h-8 shrink-0 rounded-full px-3 text-[12px] font-semibold transition-all active:scale-95',
+                                    type === t
+                                        ? 'bg-[var(--ac-secondary)] text-white'
+                                        : 'border border-[var(--ac-outline-variant)] bg-[var(--ac-surface-container-lowest)] text-[var(--ac-on-surface-variant)] hover:bg-[var(--ac-surface-container)]',
+                                )}
+                            >
+                                {t}
+                            </button>
+                        ))}
+                    </div>
+
+                    {/* ── results count ── */}
+                    <p className="mb-4 text-[13px] text-[var(--ac-on-surface-variant)]">
+                        {filtered.length === 0
+                            ? 'Sin resultados'
+                            : `${filtered.length} reporte${filtered.length !== 1 ? 's' : ''} encontrado${filtered.length !== 1 ? 's' : ''}`}
+                    </p>
+
+                    {/* ── grid ── */}
+                    {filtered.length === 0 ? (
+                        <div className="flex flex-col items-center py-16 text-center text-[var(--ac-on-surface-variant)]">
+                            <Shield className="mb-4 size-12 opacity-20" />
+                            <p className="text-base font-semibold">Sin reportes</p>
+                            <p className="mt-1 text-sm">Intentá con otros filtros o términos de búsqueda</p>
+                            <button
+                                type="button"
+                                onClick={() => { setSearch(''); setStatus('Todos'); setType('Todos'); }}
+                                className="mt-4 rounded-xl bg-[var(--ac-primary-fixed)] px-4 py-2 text-sm font-bold text-[var(--ac-primary)] transition-all hover:bg-[var(--ac-primary-fixed-dim)] active:scale-95"
+                            >
+                                Limpiar filtros
+                            </button>
+                        </div>
+                    ) : (
+                        <div ref={gridRef} className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+                            {filtered.map(report => (
+                                <ReportCard key={report.id} report={report} />
+                            ))}
+                        </div>
+                    )}
                 </div>
             </section>
         </AppFrame>

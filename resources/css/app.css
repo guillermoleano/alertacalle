@@ -113,10 +113,47 @@
     --ac-primary-container: #1e3a8a;
     --ac-primary-fixed: #dce1ff;
     --ac-primary-fixed-dim: #b6c4ff;
+    --ac-on-primary-fixed: #00164e;
     --ac-secondary: #006b5f;
     --ac-secondary-fixed: #71f8e4;
     --ac-on-secondary-fixed: #00201c;
     --ac-background: #faf8ff;
+
+    /* inverse (toast / badge oscuro en light mode) */
+    --ac-inverse-surface: #283044;
+    --ac-inverse-on-surface: #eef0ff;
+}
+
+/* ── Dark mode: tokens --ac-* ───────────────────────────────── */
+.dark {
+    --ac-background:                  #0f1117;
+    --ac-surface:                     #0f1117;
+    --ac-surface-dim:                 #0a0d13;
+    --ac-surface-bright:              #1c2133;
+    --ac-surface-container-lowest:    #090c12;
+    --ac-surface-container-low:       #131929;
+    --ac-surface-container:           #182030;
+    --ac-surface-container-high:      #1e2838;
+    --ac-surface-container-highest:   #253040;
+
+    --ac-on-surface:                  #dfe3f7;
+    --ac-on-surface-variant:          #9aa0b8;
+    --ac-outline:                     #5a6178;
+    --ac-outline-variant:             #2c3348;
+
+    --ac-primary:                     #b6c4ff;
+    --ac-on-primary:                  #00236f;
+    --ac-primary-container:           #1e3a8a;
+    --ac-primary-fixed:               #1a2540;
+    --ac-primary-fixed-dim:           #263356;
+    --ac-on-primary-fixed:            #dce1ff;
+
+    --ac-secondary:                   #4fdbc8;
+    --ac-secondary-fixed:             #003d35;
+    --ac-on-secondary-fixed:          #71f8e4;
+
+    --ac-inverse-surface:             #dfe3f7;
+    --ac-inverse-on-surface:          #283044;
 }
 
 .dark {
@@ -163,5 +200,231 @@
         @apply bg-background text-foreground;
         font-family:
             Inter, 'Instrument Sans', ui-sans-serif, system-ui, sans-serif;
+    }
+}
+
+/* ── Stagger de página ───────────────────────────────────────── */
+@keyframes ac-fade-up {
+    from { opacity: 0; transform: translateY(14px); }
+    to   { opacity: 1; transform: translateY(0);    }
+}
+
+@keyframes ac-fade-in {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+
+@keyframes ac-scale-in {
+    from { opacity: 0; transform: scale(0.95); }
+    to   { opacity: 1; transform: scale(1);    }
+}
+
+/* ── Ripple en botones ──────────────────────────────────────── */
+.ac-btn-ripple {
+    position: relative;
+    overflow: hidden;
+}
+.ac-btn-ripple::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle, rgba(255,255,255,0.25) 0%, transparent 70%);
+    transform: scale(0);
+    opacity: 0;
+    transition: transform 0.5s cubic-bezier(0.4,0,0.2,1), opacity 0.4s;
+}
+.ac-btn-ripple:active::after {
+    transform: scale(2.5);
+    opacity: 1;
+    transition: 0s;
+}
+
+/* ── Nav link shimmer hover ─────────────────────────────────── */
+.ac-nav-link {
+    position: relative;
+    overflow: hidden;
+}
+.ac-nav-link::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, transparent, rgba(64,89,170,0.08), transparent);
+    transform: translateX(-100%);
+    transition: transform 0.4s ease;
+}
+.ac-nav-link:hover::before {
+    transform: translateX(100%);
+}
+
+/* ── Card entrada suave al montar ───────────────────────────── */
+.ac-card-enter {
+    animation: ac-fade-up 0.35s cubic-bezier(0.16,1,0.3,1) both;
+}
+
+/* ── Focus ring consistente ─────────────────────────────────── */
+.ac-focus {
+    outline: none;
+}
+.ac-focus:focus-visible {
+    box-shadow: 0 0 0 3px rgba(64,89,170,0.35);
+}
+
+@layer components {
+    .slide-transition {
+        transition: transform 520ms cubic-bezier(0.4, 0, 0.2, 1);
+        will-change: transform;
+    }
+
+    .ac-landing-shell {
+        background:
+            radial-gradient(
+                circle at 18% 16%,
+                rgba(113, 248, 228, 0.34),
+                transparent 30%
+            ),
+            radial-gradient(
+                circle at 82% 72%,
+                rgba(182, 196, 255, 0.42),
+                transparent 32%
+            ),
+            linear-gradient(180deg, #faf8ff 0%, #f2f3ff 58%, #faf8ff 100%);
+    }
+
+    .ac-landing-grid {
+        position: absolute;
+        inset: 0;
+        background-image:
+            linear-gradient(rgba(117, 118, 130, 0.08) 1px, transparent 1px),
+            linear-gradient(
+                90deg,
+                rgba(117, 118, 130, 0.08) 1px,
+                transparent 1px
+            );
+        background-size: 48px 48px;
+        mask-image: radial-gradient(
+            circle at center,
+            black 0%,
+            transparent 72%
+        );
+    }
+
+    .ac-landing-glow {
+        position: absolute;
+        border-radius: 9999px;
+        filter: blur(10px);
+        opacity: 0.8;
+        animation: ac-drift 8s ease-in-out infinite alternate;
+    }
+
+    .ac-landing-glow-primary {
+        top: 10%;
+        left: 14%;
+        width: 180px;
+        height: 180px;
+        background: rgba(220, 225, 255, 0.72);
+    }
+
+    .ac-landing-glow-secondary {
+        right: 16%;
+        bottom: 13%;
+        width: 220px;
+        height: 220px;
+        background: rgba(113, 248, 228, 0.38);
+        animation-delay: -2.5s;
+    }
+
+    .ac-glass-pill {
+        border: 1px solid rgba(197, 197, 211, 0.72);
+        background: rgba(255, 255, 255, 0.58);
+        backdrop-filter: blur(18px);
+    }
+
+    .ac-hero-orbit::before,
+    .ac-hero-orbit::after {
+        position: absolute;
+        content: '';
+        border-radius: 9999px;
+        border: 1px solid rgba(64, 89, 170, 0.16);
+    }
+
+    .ac-hero-orbit::before {
+        inset: 26px;
+        animation: ac-pulse-ring 3.6s ease-in-out infinite;
+    }
+
+    .ac-hero-orbit::after {
+        inset: 58px;
+        animation: ac-pulse-ring 3.6s ease-in-out infinite 0.45s;
+    }
+
+    .ac-hero-image {
+        animation: ac-float 4.5s ease-in-out infinite;
+        filter: drop-shadow(0 18px 24px rgba(0, 35, 111, 0.12));
+    }
+
+    .ac-consent-card {
+        box-shadow:
+            inset 0 1px 0 rgba(255, 255, 255, 0.6),
+            0 16px 34px rgba(19, 27, 46, 0.08);
+    }
+
+    .ac-primary-action {
+        position: relative;
+        overflow: hidden;
+    }
+
+    .ac-primary-action::after {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: -80%;
+        width: 52%;
+        content: '';
+        transform: skewX(-20deg);
+        background: linear-gradient(
+            90deg,
+            transparent,
+            rgba(255, 255, 255, 0.22),
+            transparent
+        );
+        transition: left 520ms ease;
+    }
+
+    .ac-primary-action:hover::after {
+        left: 125%;
+    }
+}
+
+@keyframes ac-float {
+    0%,
+    100% {
+        transform: translateY(0) rotate(-0.8deg);
+    }
+
+    50% {
+        transform: translateY(-12px) rotate(0.8deg);
+    }
+}
+
+@keyframes ac-pulse-ring {
+    0%,
+    100% {
+        opacity: 0.38;
+        transform: scale(0.98);
+    }
+
+    50% {
+        opacity: 0.78;
+        transform: scale(1.04);
+    }
+}
+
+@keyframes ac-drift {
+    0% {
+        transform: translate3d(0, 0, 0) scale(1);
+    }
+
+    100% {
+        transform: translate3d(18px, -16px, 0) scale(1.08);
     }
 }
