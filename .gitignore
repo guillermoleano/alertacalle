@@ -27,3 +27,9 @@ yarn-error.log
 /.nova
 /.vscode
 /.zed
+
+# Agentes no usados (regenerables con `php artisan boost:install`).
+# Este proyecto usa solo Claude Code → .claude/ + CLAUDE.md.
+/.agents
+/.codex
+/AGENTS.md
