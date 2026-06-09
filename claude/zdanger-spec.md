@@ -464,15 +464,45 @@ VITE_MAPBOX_TOKEN=pk.eyJ1...  # Mapbox public token
   en `ReportSubmissionTest` (fecha futura/pasada, nota y su límite).
   Suite: **70 ✓ / 281 assertions**
 
-### 📋 Próximo — Fase 2
-- Alertas push por zona (FCM)
-- Panel de moderación
-- Heatmap (Mapbox Heatmap layer)
-- App móvil (React Native + Expo)
-- Estadísticas públicas por barrio/ciudad
+> Nota: **heatmap** y **clustering** de pines ya están implementados en
+> `MapboxMap` (capa heatmap + clusters + toggle de vista), así que salen del
+> backlog de "Fase 2".
 
-### 📋 Fase 3
-- Acceso para autoridades con validación oficial
-- Exportación de datos para municipios
-- Clustering de pines en el mapa (Mapbox Supercluster)
-- Modo offline (Service Worker + IndexedDB)
+## Roadmap por sprints
+
+### 🏁 Sprint 0 — Consolidación & datos demo (en curso)
+- Seeder de demo (dev): zonas para un usuario + reportes ajenos dentro + votos
+  cruzados → campana y validaciones pobladas.
+- Rate limiting en `POST /reportar` (5/h) y `/vote` (10/h).
+- Sanitización de texto (title/description/note) contra XSS.
+- Limpieza de código muerto (`demo-reports.ts` legacy, `calm-map-preview.tsx`).
+- PR + merge de `02-backend-connection-and-boost` a la rama base.
+
+### 🛡️ Sprint 1 — Roles & Moderación
+- `role` enum en `users` (citizen/moderator/authority) + Policy/middleware.
+- Panel de moderación: listar pending/denunciados, cambiar `status`
+  (validar/rechazar/fake), ver votos.
+- Auto-transiciones: 5 confirmaciones → `validated`; 3 negativas → `fake`.
+
+### 🔔 Sprint 2 — Notificaciones reales + push
+- Tabla de notificaciones persistida + eventos/listeners.
+- Página de notificaciones (lista completa, marcar leído individual).
+- FCM: `fcm_token`, push en reporte-en-zona y validación; envío por cola.
+
+### 📊 Sprint 3 — Estadísticas públicas / Insights
+- Agregados por barrio/ciudad (reportes, severidad, tendencia 7/30 días).
+- Página pública de insights con gráficos + zonas calientes (reusa heatmap).
+
+### 🚀 Sprint 4 — Producción-ready
+- Storage R2/S3 + URLs firmadas con expiración.
+- PostgreSQL + PostGIS (queries de distancia con tipos espaciales).
+- Redis para cache/queue. Deploy en Laravel Cloud.
+
+### 📱 Sprint 5 — App móvil (Fase 3)
+- React Native + Expo: reportar con cámara/GPS nativo, mapa, push.
+- Requiere exponer API JSON versionada.
+
+### 📋 Backlog (Fase 3+)
+- Acceso para autoridades con validación oficial.
+- Exportación de datos para municipios.
+- Modo offline (Service Worker + IndexedDB).
