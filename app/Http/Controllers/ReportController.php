@@ -93,6 +93,7 @@ class ReportController extends Controller
             'type' => 'required|string|max:100',
             'title' => 'nullable|string|max:200',
             'description' => 'nullable|string|max:280',
+            'note' => 'nullable|string|max:200',
             'address' => 'required|string|max:300',
             'neighborhood' => 'nullable|string|max:100',
             'city' => 'nullable|string|max:100',

@@ -4,6 +4,7 @@ import {
     MapPin,
     ShieldAlert,
     ShieldCheck,
+    StickyNote,
     ThumbsDown,
     ThumbsUp,
 } from 'lucide-react';
@@ -21,6 +22,7 @@ export type ReportSummary = {
     time: string;
     risk: 'Alto' | 'Medio' | 'Bajo';
     severity?: Severity;
+    note?: string | null;
     trustScore: number;
     confirms: number;
     denies: number;
@@ -75,24 +77,24 @@ export function ReportCard({ report }: { report: ReportSummary }) {
 
     function vote(dir: 'up' | 'down') {
         if (voted === dir) {
-return;
-}
+            return;
+        }
 
         // feedback optimista inmediato
         if (dir === 'up') {
             setConfirms((c) => c + 1);
 
             if (voted === 'down') {
-setDenies((d) => d - 1);
-}
+                setDenies((d) => d - 1);
+            }
         }
 
         if (dir === 'down') {
             setDenies((d) => d + 1);
 
             if (voted === 'up') {
-setConfirms((c) => c - 1);
-}
+                setConfirms((c) => c - 1);
+            }
         }
 
         setVoted(dir);
@@ -141,6 +143,16 @@ setConfirms((c) => c - 1);
                 <p className="mt-3 line-clamp-2 text-[13px] leading-5 text-[var(--ac-on-surface-variant)]">
                     {report.description}
                 </p>
+
+                {/* nota adicional */}
+                {report.note && (
+                    <div className="mt-2 flex gap-2 rounded-lg bg-[var(--ac-surface-container-low)] px-3 py-2">
+                        <StickyNote className="mt-0.5 size-3.5 shrink-0 text-[var(--ac-secondary)]" />
+                        <p className="text-[12px] leading-5 text-[var(--ac-on-surface-variant)]">
+                            {report.note}
+                        </p>
+                    </div>
+                )}
 
                 {/* meta */}
                 <div className="mt-3 space-y-1.5">

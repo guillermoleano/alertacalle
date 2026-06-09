@@ -93,3 +93,28 @@ test('report submission accepts a past occurrence date', function () {
 
     expect(Report::count())->toBe(1);
 });
+
+test('report submission persists an optional note', function () {
+    $this->actingAs(User::factory()->create());
+
+    $this->post(route('reportar.store'), [
+        'type' => 'Hurto celular',
+        'address' => 'Calle 100',
+        'note' => 'Frente a la panadería, esquina mal iluminada.',
+    ])->assertRedirect(route('reportes'));
+
+    expect(Report::firstOrFail()->note)
+        ->toBe('Frente a la panadería, esquina mal iluminada.');
+});
+
+test('report note cannot exceed 200 characters', function () {
+    $this->actingAs(User::factory()->create());
+
+    $this->post(route('reportar.store'), [
+        'type' => 'Hurto celular',
+        'address' => 'Calle 100',
+        'note' => str_repeat('a', 201),
+    ])->assertSessionHasErrors('note');
+
+    expect(Report::count())->toBe(0);
+});

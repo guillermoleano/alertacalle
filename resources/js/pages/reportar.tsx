@@ -45,6 +45,7 @@ export default function Reportar() {
     const [barrio, setBarrio] = useState('');
     const [datetime, setDatetime] = useState('');
     const [desc, setDesc] = useState('');
+    const [note, setNote] = useState('');
     const [anon, setAnon] = useState(true);
     const [files, setFiles] = useState<File[]>([]);
     const [coords, setCoords] = useState<Coords>(null);
@@ -106,7 +107,7 @@ export default function Reportar() {
     }
 
     /* ── Tope de fecha (no se permite fecha futura del hecho) ── */
-     
+
     const [maxDateTime] = useState(() => localDateTimeValue(new Date()));
 
     /* ── Autodetección al abrir el wizard (una vez) ── */
@@ -167,6 +168,7 @@ export default function Reportar() {
                 type: incType,
                 title: incType,
                 description: desc || null,
+                note: note || null,
                 address,
                 neighborhood: barrio || null,
                 latitude: resolved?.lat ?? null,
@@ -449,6 +451,37 @@ export default function Reportar() {
                                         maxLength={280}
                                         className="min-h-28 w-full resize-none rounded-xl border border-[var(--ac-outline-variant)] bg-white p-4 text-sm leading-6 outline-none focus:ring-2 focus:ring-[var(--ac-primary)]"
                                         placeholder="Ej: ocurrió frente al paradero, zona poco iluminada…"
+                                    />
+                                </label>
+
+                                {/* nota adicional */}
+                                <label className="grid gap-1.5">
+                                    <div className="flex items-center justify-between">
+                                        <span className="text-[13px] font-semibold text-[var(--ac-on-surface)]">
+                                            Nota adicional{' '}
+                                            <span className="font-normal text-[var(--ac-on-surface-variant)]">
+                                                (opcional)
+                                            </span>
+                                        </span>
+                                        <span
+                                            className={cn(
+                                                'text-[11px]',
+                                                note.length > 180
+                                                    ? 'text-red-500'
+                                                    : 'text-[var(--ac-on-surface-variant)]',
+                                            )}
+                                        >
+                                            {note.length}/200
+                                        </span>
+                                    </div>
+                                    <input
+                                        value={note}
+                                        onChange={(e) =>
+                                            setNote(e.target.value)
+                                        }
+                                        maxLength={200}
+                                        className="min-h-11 w-full rounded-xl border border-[var(--ac-outline-variant)] bg-white px-4 text-sm outline-none focus:ring-2 focus:ring-[var(--ac-primary)]"
+                                        placeholder="Ej: referencia, detalle útil para identificar el lugar…"
                                     />
                                 </label>
 
