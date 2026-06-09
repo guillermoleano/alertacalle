@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\AlertZoneController;
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\ReportController;
 use Illuminate\Support\Facades\Route;
 
@@ -17,7 +19,15 @@ Route::middleware(['auth'])->group(function () {
 
     /* ── Páginas de cuenta ── */
     Route::get('/mi-perfil', [ReportController::class, 'profile'])->name('mi-perfil');
-    Route::inertia('/ajustes', 'ajustes')->name('ajustes');
+    Route::get('/ajustes', [AlertZoneController::class, 'index'])->name('ajustes');
+
+    /* ── Zonas de alerta ── */
+    Route::post('/zonas', [AlertZoneController::class, 'store'])->name('zonas.store');
+    Route::put('/zonas/{zone}', [AlertZoneController::class, 'update'])->name('zonas.update');
+    Route::delete('/zonas/{zone}', [AlertZoneController::class, 'destroy'])->name('zonas.destroy');
+
+    /* ── Notificaciones ── */
+    Route::post('/notificaciones/visto', [NotificationController::class, 'seen'])->name('notificaciones.visto');
 });
 
 Route::middleware(['auth', 'verified'])->group(function () {

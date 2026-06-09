@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Support\UserAlerts;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 
@@ -35,12 +36,17 @@ class HandleInertiaRequests extends Middleware
      */
     public function share(Request $request): array
     {
+        $user = $request->user();
+
         return [
             ...parent::share($request),
             'name' => config('app.name'),
             'auth' => [
-                'user' => $request->user(),
+                'user' => $user,
             ],
+            'notifications' => $user
+                ? UserAlerts::for($user)->toArray()
+                : ['unread' => 0, 'items' => []],
             'flash' => [
                 'toast' => $request->session()->get('toast'),
             ],

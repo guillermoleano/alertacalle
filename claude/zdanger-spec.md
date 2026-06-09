@@ -397,10 +397,30 @@ VITE_MAPBOX_TOKEN=pk.eyJ1...  # Mapbox public token
 - **Tests** (`tests/Feature/ProfilePageTest.php`): auth requerido +
   stats/reputación calculadas correctamente. Suite: 45 ✓ / 176 assertions
 
-### 📋 Próximo — Hito 4 (crecimiento)
-- Clustering de pines + heatmap en el mapa
-- Filtro por fecha en mapa/reportes
-- Zonas de alerta funcionales + notificaciones in-app
+### ✅ Hito 4 — Frente #2: Zonas de alerta + notificaciones
+- **Zonas de alerta funcionales** (`alert_zones`: label, lat/lng, radio, active):
+  migración + modelo `AlertZone` + factory, `AlertZoneController`
+  (`index` rinde `/ajustes` con las zonas del usuario; `store`/`update`/`destroy`
+  con auth y chequeo de propiedad → 403 si la zona es ajena)
+- **Ajustes**: sección de zonas conectada a datos reales (antes mock).
+  Modal de alta/edición con nombre, radio (300/500/800/1000 m), geocoding de
+  dirección (`forwardGeocode`) + botón "usar mi ubicación"
+  (`navigator.geolocation` + `reverseGeocode`). Empty state + borrado con confirm
+- **Campana de notificaciones real** en el header (`app-frame.tsx`): dropdown con
+  badge de no-leídas, cierre por click-afuera/Escape. Reemplaza el punto rojo
+  decorativo
+- **Feed derivado on-the-fly** (sin tabla, sin event-wiring) vía servicio
+  `App\Support\UserAlerts`: (a) reportes recientes dentro de zonas activas
+  (Haversine en PHP) y (b) confirmaciones de terceros a mis reportes. Se comparte
+  globalmente en `HandleInertiaRequests` (`notifications: { unread, items }`)
+- **No-leídas** vía `users.alerts_seen_at`; `POST /notificaciones/visto` lo setea
+  y refresca solo la prop (`router.reload only: ['notifications']`)
+- **Tests** (`AlertZoneTest` 7 casos, `NotificationsTest` 5 casos): CRUD + auth +
+  propiedad, alertas por zona/validación, exclusión de votos propios, marcar
+  visto. Suite: 57 ✓ / 258 assertions
+
+### 📋 Próximo — Hito 4 (restante)
+- Filtro por fecha en mapa/reportes (si no quedó cubierto en el frente #1)
 
 ### 📋 Fase 2
 - Alertas push por zona (FCM)
