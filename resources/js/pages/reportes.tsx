@@ -9,11 +9,8 @@ import {
 } from 'lucide-react';
 import { useState } from 'react';
 import { AppFrame } from '@/components/alertacalle/app-frame';
-import {
-    ReportCard
-    
-} from '@/components/alertacalle/report-card';
-import type {ReportSummary} from '@/components/alertacalle/report-card';
+import { ReportCard } from '@/components/alertacalle/report-card';
+import type { ReportSummary } from '@/components/alertacalle/report-card';
 import { incidentTypes } from '@/data/demo-reports';
 import { useStagger } from '@/hooks/use-stagger';
 import { cn } from '@/lib/utils';
@@ -35,6 +32,10 @@ const rangeMs: Record<DateRange, number> = {
     '7d': 7 * 24 * 60 * 60 * 1000,
     '30d': 30 * 24 * 60 * 60 * 1000,
 };
+
+type SeverityFilter = 'Todas' | 'Alta' | 'Media' | 'Baja';
+
+const severityFilters: SeverityFilter[] = ['Todas', 'Alta', 'Media', 'Baja'];
 
 const statusTabs: {
     value: StatusFilter;
@@ -81,6 +82,7 @@ export default function Reportes({
     const [type, setType] = useState('Todos');
     const [sort, setSort] = useState<SortOption>('reciente');
     const [dateRange, setDateRange] = useState<DateRange>('todo');
+    const [severity, setSeverity] = useState<SeverityFilter>('Todas');
     const gridRef = useStagger<HTMLDivElement>(70, 50);
 
     const now = Date.now();
@@ -88,6 +90,8 @@ export default function Reportes({
         .filter((r) => {
             const matchStatus = status === 'Todos' || r.risk === status;
             const matchType = type === 'Todos' || r.type === type;
+            const matchSeverity =
+                severity === 'Todas' || r.severity === severity;
             const matchSearch =
                 search === '' ||
                 r.title.toLowerCase().includes(search.toLowerCase()) ||
@@ -98,16 +102,22 @@ export default function Reportes({
                 !when ||
                 now - new Date(when).getTime() <= rangeMs[dateRange];
 
-            return matchStatus && matchType && matchSearch && matchDate;
+            return (
+                matchStatus &&
+                matchType &&
+                matchSeverity &&
+                matchSearch &&
+                matchDate
+            );
         })
         .sort((a, b) => {
             if (sort === 'confianza') {
-return b.trustScore - a.trustScore;
-}
+                return b.trustScore - a.trustScore;
+            }
 
             if (sort === 'riesgo') {
-return riskOrder[b.risk] - riskOrder[a.risk];
-}
+                return riskOrder[b.risk] - riskOrder[a.risk];
+            }
 
             return 0; // reciente: orden original
         });
@@ -266,23 +276,49 @@ return riskOrder[b.risk] - riskOrder[a.risk];
                         ))}
                     </div>
 
-                    {/* ── date range ── */}
-                    <div className="mb-5 flex w-fit gap-1.5 rounded-xl bg-[var(--ac-surface-container)] p-1">
-                        {dateRanges.map((r) => (
-                            <button
-                                key={r.value}
-                                type="button"
-                                onClick={() => setDateRange(r.value)}
-                                className={cn(
-                                    'min-h-8 rounded-lg px-3 text-[12px] font-bold transition-all active:scale-95',
-                                    dateRange === r.value
-                                        ? 'bg-[var(--ac-surface-container-lowest)] text-[var(--ac-primary)] shadow-sm'
-                                        : 'text-[var(--ac-on-surface-variant)] hover:text-[var(--ac-on-surface)]',
-                                )}
-                            >
-                                {r.label}
-                            </button>
-                        ))}
+                    {/* ── date range + severidad ── */}
+                    <div className="mb-5 flex flex-wrap items-center gap-3">
+                        <div className="flex w-fit gap-1.5 rounded-xl bg-[var(--ac-surface-container)] p-1">
+                            {dateRanges.map((r) => (
+                                <button
+                                    key={r.value}
+                                    type="button"
+                                    onClick={() => setDateRange(r.value)}
+                                    className={cn(
+                                        'min-h-8 rounded-lg px-3 text-[12px] font-bold transition-all active:scale-95',
+                                        dateRange === r.value
+                                            ? 'bg-[var(--ac-surface-container-lowest)] text-[var(--ac-primary)] shadow-sm'
+                                            : 'text-[var(--ac-on-surface-variant)] hover:text-[var(--ac-on-surface)]',
+                                    )}
+                                >
+                                    {r.label}
+                                </button>
+                            ))}
+                        </div>
+
+                        <div className="flex items-center gap-2">
+                            <span className="inline-flex items-center gap-1 text-[12px] font-semibold text-[var(--ac-on-surface-variant)]">
+                                <ShieldAlert className="size-3.5" />
+                                Severidad
+                            </span>
+                            <div className="flex w-fit gap-1.5 rounded-xl bg-[var(--ac-surface-container)] p-1">
+                                {severityFilters.map((s) => (
+                                    <button
+                                        key={s}
+                                        type="button"
+                                        onClick={() => setSeverity(s)}
+                                        className={cn(
+                                            'min-h-8 rounded-lg px-3 text-[12px] font-bold transition-all active:scale-95',
+                                            severity === s
+                                                ? 'bg-[var(--ac-surface-container-lowest)] text-[var(--ac-primary)] shadow-sm'
+                                                : 'text-[var(--ac-on-surface-variant)] hover:text-[var(--ac-on-surface)]',
+                                        )}
+                                    >
+                                        {s}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
                     </div>
 
                     {/* ── results count ── */}
@@ -309,6 +345,7 @@ return riskOrder[b.risk] - riskOrder[a.risk];
                                     setStatus('Todos');
                                     setType('Todos');
                                     setDateRange('todo');
+                                    setSeverity('Todas');
                                 }}
                                 className="mt-4 rounded-xl bg-[var(--ac-primary-fixed)] px-4 py-2 text-sm font-bold text-[var(--ac-primary)] transition-all hover:bg-[var(--ac-primary-fixed-dim)] active:scale-95"
                             >

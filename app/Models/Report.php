@@ -54,6 +54,30 @@ class Report extends Model
         return $this->hasMany(ReportMedia::class);
     }
 
+    /* ── severidad por tipo ── */
+
+    /**
+     * Severidad intrínseca según el tipo de incidente, independiente de los
+     * votos (a diferencia de risk_level, que se deriva del trust_score).
+     *
+     * @var array<string, 'Alta'|'Media'|'Baja'>
+     */
+    private const SEVERITY_BY_TYPE = [
+        'Intimidación con arma' => 'Alta',
+        'Atraco en moto' => 'Alta',
+        'Fleteo' => 'Alta',
+        'Atraco a pie' => 'Media',
+        'Hurto celular' => 'Media',
+        'Otro' => 'Media',
+        'Cosquilleo' => 'Baja',
+    ];
+
+    /** @return 'Alta'|'Media'|'Baja' */
+    public static function severityForType(?string $type): string
+    {
+        return self::SEVERITY_BY_TYPE[$type] ?? 'Media';
+    }
+
     /* ── helpers ── */
 
     /**
@@ -91,6 +115,7 @@ class Report extends Model
             'createdAt' => $this->created_at->toIso8601String(),
             'occurredAt' => ($this->occurred_at ?? $this->created_at)->toIso8601String(),
             'risk' => $this->risk_level,
+            'severity' => self::severityForType($this->type),
             'trustScore' => $this->trust_score,
             'confirms' => $this->confirms_count,
             'denies' => $this->denies_count,

@@ -1,7 +1,16 @@
 import { router } from '@inertiajs/react';
-import { Clock, MapPin, ShieldCheck, ThumbsDown, ThumbsUp } from 'lucide-react';
+import {
+    Clock,
+    MapPin,
+    ShieldAlert,
+    ShieldCheck,
+    ThumbsDown,
+    ThumbsUp,
+} from 'lucide-react';
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
+
+export type Severity = 'Alta' | 'Media' | 'Baja';
 
 export type ReportSummary = {
     id: string | number;
@@ -11,6 +20,7 @@ export type ReportSummary = {
     description: string;
     time: string;
     risk: 'Alto' | 'Medio' | 'Bajo';
+    severity?: Severity;
     trustScore: number;
     confirms: number;
     denies: number;
@@ -20,36 +30,71 @@ export type ReportSummary = {
     occurredAt?: string;
 };
 
+export const severityConfig: Record<Severity, { label: string; text: string }> =
+    {
+        Alta: { label: 'Severidad alta', text: 'text-red-600' },
+        Media: { label: 'Severidad media', text: 'text-amber-600' },
+        Baja: { label: 'Severidad baja', text: 'text-emerald-600' },
+    };
+
 const riskConfig = {
-    Alto:  { pill: 'bg-red-100 text-red-700 border border-red-200',     dot: 'bg-red-500',     bar: 'bg-red-500'    },
-    Medio: { pill: 'bg-amber-100 text-amber-700 border border-amber-200', dot: 'bg-amber-500',   bar: 'bg-amber-500'  },
-    Bajo:  { pill: 'bg-emerald-100 text-emerald-700 border border-emerald-200', dot: 'bg-emerald-500', bar: 'bg-emerald-500' },
+    Alto: {
+        pill: 'bg-red-100 text-red-700 border border-red-200',
+        dot: 'bg-red-500',
+        bar: 'bg-red-500',
+    },
+    Medio: {
+        pill: 'bg-amber-100 text-amber-700 border border-amber-200',
+        dot: 'bg-amber-500',
+        bar: 'bg-amber-500',
+    },
+    Bajo: {
+        pill: 'bg-emerald-100 text-emerald-700 border border-emerald-200',
+        dot: 'bg-emerald-500',
+        bar: 'bg-emerald-500',
+    },
 };
 
 const typeIcons: Record<string, string> = {
-    'Hurto celular'          : '📱',
-    'Atraco a pie'           : '🚶',
-    'Atraco en moto'         : '🏍️',
-    'Fleteo'                 : '💳',
-    'Cosquilleo'             : '👋',
-    'Intimidación con arma'  : '⚠️',
-    'Otro'                   : '📋',
+    'Hurto celular': '📱',
+    'Atraco a pie': '🚶',
+    'Atraco en moto': '🏍️',
+    Fleteo: '💳',
+    Cosquilleo: '👋',
+    'Intimidación con arma': '⚠️',
+    Otro: '📋',
 };
 
 export function ReportCard({ report }: { report: ReportSummary }) {
     const [confirms, setConfirms] = useState(report.confirms);
-    const [denies,   setDenies]   = useState(report.denies);
-    const [voted,    setVoted]    = useState<'up' | 'down' | null>(null);
+    const [denies, setDenies] = useState(report.denies);
+    const [voted, setVoted] = useState<'up' | 'down' | null>(null);
     const rc = riskConfig[report.risk];
     const emoji = typeIcons[report.type] ?? '📋';
     const trustPct = `${Math.min(report.trustScore, 100)}%`;
 
     function vote(dir: 'up' | 'down') {
-        if (voted === dir) return;
+        if (voted === dir) {
+return;
+}
 
         // feedback optimista inmediato
-        if (dir === 'up')   { setConfirms(c => c + 1); if (voted === 'down') setDenies(d => d - 1); }
-        if (dir === 'down') { setDenies(d => d + 1);   if (voted === 'up')   setConfirms(c => c - 1); }
+        if (dir === 'up') {
+            setConfirms((c) => c + 1);
+
+            if (voted === 'down') {
+setDenies((d) => d - 1);
+}
+        }
+
+        if (dir === 'down') {
+            setDenies((d) => d + 1);
+
+            if (voted === 'up') {
+setConfirms((c) => c - 1);
+}
+        }
+
         setVoted(dir);
 
         // persistir en el backend (guest → redirige a login por middleware auth)
@@ -61,7 +106,7 @@ export function ReportCard({ report }: { report: ReportSummary }) {
     }
 
     return (
-        <article className="group relative overflow-hidden rounded-2xl border border-[var(--ac-outline-variant)] bg-[var(--ac-surface-container-lowest)] shadow-[0_2px_12px_rgba(19,27,46,0.05)] dark:shadow-none transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_8px_24px_rgba(19,27,46,0.10)] dark:hover:shadow-[0_4px_20px_rgba(0,0,0,0.35)]">
+        <article className="group relative overflow-hidden rounded-2xl border border-[var(--ac-outline-variant)] bg-[var(--ac-surface-container-lowest)] shadow-[0_2px_12px_rgba(19,27,46,0.05)] transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_8px_24px_rgba(19,27,46,0.10)] dark:shadow-none dark:hover:shadow-[0_4px_20px_rgba(0,0,0,0.35)]">
             {/* risk accent bar */}
             <div className={cn('h-1 w-full', rc.bar)} />
 
@@ -73,22 +118,27 @@ export function ReportCard({ report }: { report: ReportSummary }) {
                             {emoji}
                         </span>
                         <div>
-                            <p className="text-[11px] font-bold uppercase tracking-wide text-[var(--ac-secondary)]">
+                            <p className="text-[11px] font-bold tracking-wide text-[var(--ac-secondary)] uppercase">
                                 {report.type}
                             </p>
-                            <h3 className="text-[15px] font-bold leading-snug text-[var(--ac-on-surface)]">
+                            <h3 className="text-[15px] leading-snug font-bold text-[var(--ac-on-surface)]">
                                 {report.title}
                             </h3>
                         </div>
                     </div>
-                    <span className={cn('shrink-0 rounded-full px-2.5 py-1 text-[11px] font-bold uppercase tracking-wide flex items-center gap-1', rc.pill)}>
+                    <span
+                        className={cn(
+                            'flex shrink-0 items-center gap-1 rounded-full px-2.5 py-1 text-[11px] font-bold tracking-wide uppercase',
+                            rc.pill,
+                        )}
+                    >
                         <span className={cn('size-1.5 rounded-full', rc.dot)} />
                         {report.risk}
                     </span>
                 </div>
 
                 {/* description */}
-                <p className="mt-3 text-[13px] leading-5 text-[var(--ac-on-surface-variant)] line-clamp-2">
+                <p className="mt-3 line-clamp-2 text-[13px] leading-5 text-[var(--ac-on-surface-variant)]">
                     {report.description}
                 </p>
 
@@ -102,6 +152,17 @@ export function ReportCard({ report }: { report: ReportSummary }) {
                         <Clock className="size-3.5 shrink-0 text-[var(--ac-primary)]" />
                         {report.time}
                     </span>
+                    {report.severity && (
+                        <span className="flex items-center gap-2 text-[12px] text-[var(--ac-on-surface-variant)]">
+                            <ShieldAlert
+                                className={cn(
+                                    'size-3.5 shrink-0',
+                                    severityConfig[report.severity].text,
+                                )}
+                            />
+                            {severityConfig[report.severity].label}
+                        </span>
+                    )}
                 </div>
 
                 {/* trust score bar */}
