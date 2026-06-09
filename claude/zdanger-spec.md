@@ -13,7 +13,7 @@ App web (con proyección a móvil) para el reporte ciudadano de asaltos y robos 
 
 | Capa | Tecnología | Estado |
 |---|---|---|
-| Backend | Laravel 11 (PHP 8.3) | ✅ Activo |
+| Backend | Laravel 13 (PHP 8.4) | ✅ Activo |
 | SPA bridge | Inertia.js v3 | ✅ Activo |
 | Frontend | React 19 + TypeScript + Vite 8 | ✅ Activo |
 | Estilos | Tailwind CSS v4 + sistema de tokens `--ac-*` (Material Design 3) | ✅ Activo |
@@ -136,10 +136,14 @@ name (string)
 email (string, unique)
 phone (string, nullable)
 password (hashed)
+alerts_seen_at (timestamp, nullable) — marca de "notificaciones leídas"
 role (enum: citizen, moderator, authority) — pendiente agregar
 fcm_token (string, nullable) — Fase 2
 created_at / updated_at
 ```
+
+> Nota: las tablas usan PK `bigint` autoincrement (`$table->id()`), no UUID
+> (el esquema de abajo se conserva como referencia conceptual).
 
 ### `reports`
 ```
@@ -187,10 +191,10 @@ size_bytes (integer)
 created_at
 ```
 
-### `alert_zones`
+### `alert_zones` ✅ implementada
 ```
-id (uuid)
-user_id (uuid, FK → users)
+id
+user_id (FK → users, cascade on delete)
 label (string) — ej: "Casa", "Trabajo", "Gym"
 latitude (decimal)
 longitude (decimal)
@@ -277,17 +281,30 @@ Esto pondera por cantidad de votos: un reporte con 10 confirms/0 denies pesa má
 
 ## Rutas web (Inertia)
 
-```php
-Route::get('/mapa',     [ReportController::class, 'mapa']);
-Route::get('/reportes', [ReportController::class, 'index']);
-Route::get('/reportar', [ReportController::class, 'create']);
-Route::post('/reportar', [ReportController::class, 'store']);
-Route::post('/reports/{report}/vote', [ReportController::class, 'vote']);
-Route::get('/ajustes',   fn() => Inertia::render('ajustes'));
-Route::get('/mi-perfil', fn() => Inertia::render('mi-perfil'));
-```
+Esquema **mixto**: la lectura es pública; escribir y las páginas de cuenta
+requieren sesión (`auth`).
 
-> ⚠️ Las rutas del `ReportController` están creadas en el controlador pero **aún no registradas en `web.php`** (pendiente).
+```php
+/* Público */
+Route::get('/mapa',     [ReportController::class, 'mapa'])->name('mapa');
+Route::get('/reportes', [ReportController::class, 'index'])->name('reportes');
+
+/* Requiere auth */
+Route::middleware(['auth'])->group(function () {
+    Route::get('/reportar',  [ReportController::class, 'create'])->name('reportar');
+    Route::post('/reportar', [ReportController::class, 'store'])->name('reportar.store');
+    Route::post('/reportes/{report}/vote', [ReportController::class, 'vote'])->name('reportes.vote');
+
+    Route::get('/mi-perfil', [ReportController::class, 'profile'])->name('mi-perfil');
+    Route::get('/ajustes',   [AlertZoneController::class, 'index'])->name('ajustes');
+
+    Route::post('/zonas',          [AlertZoneController::class, 'store'])->name('zonas.store');
+    Route::put('/zonas/{zone}',    [AlertZoneController::class, 'update'])->name('zonas.update');
+    Route::delete('/zonas/{zone}', [AlertZoneController::class, 'destroy'])->name('zonas.destroy');
+
+    Route::post('/notificaciones/visto', [NotificationController::class, 'seen'])->name('notificaciones.visto');
+});
+```
 
 ---
 
@@ -419,10 +436,13 @@ VITE_MAPBOX_TOKEN=pk.eyJ1...  # Mapbox public token
   propiedad, alertas por zona/validación, exclusión de votos propios, marcar
   visto. Suite: 57 ✓ / 258 assertions
 
-### 📋 Próximo — Hito 4 (restante)
-- Filtro por fecha en mapa/reportes (si no quedó cubierto en el frente #1)
+### ✅ Hito 4 — Filtro por fecha (completo)
+- Filtro por rango de fecha (Todo / 24 h / 7 días / 30 días) en **`/mapa`**
+  (frente #1) y portado a **`/reportes`** (frente #2). Client-side sobre
+  `occurredAt ?? createdAt`, integrado al reset de "Limpiar filtros".
+  Con esto el Hito 4 queda cerrado por completo.
 
-### 📋 Fase 2
+### 📋 Próximo — Fase 2
 - Alertas push por zona (FCM)
 - Panel de moderación
 - Heatmap (Mapbox Heatmap layer)
