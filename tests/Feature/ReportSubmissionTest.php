@@ -118,3 +118,22 @@ test('report note cannot exceed 200 characters', function () {
 
     expect(Report::count())->toBe(0);
 });
+
+test('report submission is rate limited to 5 per hour', function () {
+    $this->actingAs(User::factory()->create());
+
+    foreach (range(1, 5) as $i) {
+        $this->post(route('reportar.store'), [
+            'type' => 'Hurto celular',
+            'address' => "Calle {$i}",
+        ])->assertRedirect(route('reportes'));
+    }
+
+    // el 6º intento dentro de la hora es bloqueado
+    $this->post(route('reportar.store'), [
+        'type' => 'Hurto celular',
+        'address' => 'Calle 6',
+    ])->assertStatus(429);
+
+    expect(Report::count())->toBe(5);
+});

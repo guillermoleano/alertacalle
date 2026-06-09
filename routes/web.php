@@ -14,8 +14,12 @@ Route::get('/reportes', [ReportController::class, 'index'])->name('reportes');
 /* ── Acciones que requieren sesión (esquema mixto) ── */
 Route::middleware(['auth'])->group(function () {
     Route::get('/reportar', [ReportController::class, 'create'])->name('reportar');
-    Route::post('/reportar', [ReportController::class, 'store'])->name('reportar.store');
-    Route::post('/reportes/{report}/vote', [ReportController::class, 'vote'])->name('reportes.vote');
+    Route::post('/reportar', [ReportController::class, 'store'])
+        ->middleware('throttle:5,60') // 5 reportes por hora
+        ->name('reportar.store');
+    Route::post('/reportes/{report}/vote', [ReportController::class, 'vote'])
+        ->middleware('throttle:10,60') // 10 votos por hora
+        ->name('reportes.vote');
 
     /* ── Páginas de cuenta ── */
     Route::get('/mi-perfil', [ReportController::class, 'profile'])->name('mi-perfil');
