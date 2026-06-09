@@ -31,9 +31,9 @@ class Report extends Model
     ];
 
     protected $casts = [
-        'anonymous'   => 'boolean',
-        'latitude'    => 'float',
-        'longitude'   => 'float',
+        'anonymous' => 'boolean',
+        'latitude' => 'float',
+        'longitude' => 'float',
         'occurred_at' => 'datetime',
     ];
 
@@ -68,13 +68,13 @@ class Report extends Model
         $risk = match (true) {
             $score >= 70 => 'Alto',
             $score >= 40 => 'Medio',
-            default      => 'Bajo',
+            default => 'Bajo',
         };
 
         $this->update([
             'trust_score' => $score,
-            'risk_level'  => $risk,
-            'status'      => $this->confirms_count >= 5 ? 'validated' : $this->status,
+            'risk_level' => $risk,
+            'status' => $this->confirms_count >= 5 ? 'validated' : $this->status,
         ]);
     }
 
@@ -82,19 +82,21 @@ class Report extends Model
     public function toInertia(): array
     {
         return [
-            'id'          => $this->id,
-            'title'       => $this->title,
-            'type'        => $this->type,
-            'location'    => $this->address,
+            'id' => $this->id,
+            'title' => $this->title,
+            'type' => $this->type,
+            'location' => $this->address,
             'description' => $this->description ?? '',
-            'time'        => $this->created_at->diffForHumans(),
-            'risk'        => $this->risk_level,
-            'trustScore'  => $this->trust_score,
-            'confirms'    => $this->confirms_count,
-            'denies'      => $this->denies_count,
-            'status'      => $this->status,
-            'lat'         => $this->latitude,
-            'lng'         => $this->longitude,
+            'time' => ($this->occurred_at ?? $this->created_at)->diffForHumans(),
+            'createdAt' => $this->created_at->toIso8601String(),
+            'occurredAt' => ($this->occurred_at ?? $this->created_at)->toIso8601String(),
+            'risk' => $this->risk_level,
+            'trustScore' => $this->trust_score,
+            'confirms' => $this->confirms_count,
+            'denies' => $this->denies_count,
+            'status' => $this->status,
+            'lat' => $this->latitude,
+            'lng' => $this->longitude,
         ];
     }
 }

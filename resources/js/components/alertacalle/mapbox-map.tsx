@@ -21,14 +21,70 @@ const TYPE_EMOJIS: Record<string, string> = {
     'Otro':                  '📋',
 };
 
+export type MapViewMode = 'pins' | 'heat';
+
 interface Props {
     reports: ReportSummary[];
-    /** lat/lng center — defaults to Bogotá */
     center?: [number, number];
     zoom?: number;
     className?: string;
+    viewMode?: MapViewMode;
     onSelectReport?: (id: string | number | null) => void;
     selectedReportId?: string | number | null;
+}
+
+/* ── ids de fuentes/capas ── */
+const SRC = 'reports';
+const SRC_HEAT = 'reports-heat';
+const L_CLUSTER = 'zd-clusters';
+const L_CLUSTER_COUNT = 'zd-cluster-count';
+const L_POINT = 'zd-point';
+const L_EMOJI = 'zd-emoji';
+const L_SELECTED = 'zd-selected';
+const L_HEAT = 'zd-heat';
+const PIN_LAYERS = [L_CLUSTER, L_CLUSTER_COUNT, L_POINT, L_EMOJI, L_SELECTED];
+
+function toFeatureCollection(reports: ReportSummary[]): GeoJSON.FeatureCollection {
+    return {
+        type: 'FeatureCollection',
+        features: reports
+            .filter(r => r.lat != null && r.lng != null)
+            .map(r => ({
+                type: 'Feature',
+                geometry: { type: 'Point', coordinates: [r.lng!, r.lat!] },
+                properties: {
+                    id: r.id,
+                    risk: r.risk,
+                    color: RISK_COLORS[r.risk],
+                    emoji: TYPE_EMOJIS[r.type] ?? '📋',
+                    title: r.title,
+                    type: r.type,
+                    location: r.location,
+                    time: r.time,
+                    trust: r.trustScore,
+                },
+            })),
+    };
+}
+
+function popupHTML(p: Record<string, unknown>): string {
+    const color = String(p.color);
+    return `
+        <div style="font-family: Inter, sans-serif; padding: 4px 2px;">
+            <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
+                <span style="font-size:20px">${p.emoji}</span>
+                <div>
+                    <p style="margin:0; font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.06em; color:${color}">${p.type}</p>
+                    <p style="margin:0; font-size:13px; font-weight:700; color:inherit;">${p.title}</p>
+                </div>
+            </div>
+            <p style="margin:0 0 4px; font-size:11px; opacity:0.7;">${p.location}</p>
+            <p style="margin:0 0 8px; font-size:11px; opacity:0.6;">${p.time}</p>
+            <div style="display:flex; justify-content:space-between; align-items:center; font-size:11px;">
+                <span style="background:${color}22; color:${color}; border-radius:999px; padding:2px 8px; font-weight:700;">${p.risk}</span>
+                <span style="opacity:0.6;">Confianza: <b>${p.trust}/100</b></span>
+            </div>
+        </div>`;
 }
 
 export function MapboxMap({
@@ -36,27 +92,184 @@ export function MapboxMap({
     center = [-74.0721, 4.7110],
     zoom = 13,
     className,
+    viewMode = 'pins',
     onSelectReport,
     selectedReportId,
 }: Props) {
     const containerRef = useRef<HTMLDivElement>(null);
     const mapRef       = useRef<mapboxgl.Map | null>(null);
-    const markersRef   = useRef<Record<string, mapboxgl.Marker>>({});
     const popupRef     = useRef<mapboxgl.Popup | null>(null);
-    const [ready, setReady] = useState(false);
+    const handlersRef  = useRef(false);
+    const onSelectRef  = useRef(onSelectReport);
+    onSelectRef.current = onSelectReport;
+    const reportsRef   = useRef(reports);
+    reportsRef.current = reports;
+    const [loaded, setLoaded] = useState(false);
 
-    /* ── detect dark mode ──────────────────────────────────── */
     const isDark = () => document.documentElement.classList.contains('dark');
-
     const mapStyle = () =>
-        isDark()
-            ? 'mapbox://styles/mapbox/dark-v11'
-            : 'mapbox://styles/mapbox/light-v11';
+        isDark() ? 'mapbox://styles/mapbox/dark-v11' : 'mapbox://styles/mapbox/light-v11';
 
-    /* ── init map ──────────────────────────────────────────── */
+    /* ── crea fuentes + capas (re-ejecutable tras setStyle) ── */
+    function setupLayers(map: mapboxgl.Map) {
+        if (!map.getSource(SRC)) {
+            map.addSource(SRC, {
+                type: 'geojson',
+                data: toFeatureCollection(reportsRef.current),
+                cluster: true,
+                clusterRadius: 50,
+                clusterMaxZoom: 14,
+            });
+        }
+        if (!map.getSource(SRC_HEAT)) {
+            map.addSource(SRC_HEAT, { type: 'geojson', data: toFeatureCollection(reports) });
+        }
+
+        if (!map.getLayer(L_HEAT)) {
+            map.addLayer({
+                id: L_HEAT,
+                type: 'heatmap',
+                source: SRC_HEAT,
+                paint: {
+                    'heatmap-weight': ['interpolate', ['linear'], ['get', 'trust'], 0, 0.3, 100, 1],
+                    'heatmap-intensity': 1.1,
+                    'heatmap-radius': 34,
+                    'heatmap-opacity': 0.85,
+                    'heatmap-color': [
+                        'interpolate', ['linear'], ['heatmap-density'],
+                        0, 'rgba(16,185,129,0)',
+                        0.3, 'rgba(16,185,129,0.6)',
+                        0.6, 'rgba(245,158,11,0.7)',
+                        1, 'rgba(239,68,68,0.85)',
+                    ],
+                },
+            });
+        }
+        if (!map.getLayer(L_CLUSTER)) {
+            map.addLayer({
+                id: L_CLUSTER,
+                type: 'circle',
+                source: SRC,
+                filter: ['has', 'point_count'],
+                paint: {
+                    'circle-color': ['step', ['get', 'point_count'], '#60a5fa', 10, '#3b82f6', 25, '#1e3a8a'],
+                    'circle-radius': ['step', ['get', 'point_count'], 16, 10, 22, 25, 30],
+                    'circle-stroke-width': 3,
+                    'circle-stroke-color': 'rgba(255,255,255,0.7)',
+                },
+            });
+        }
+        if (!map.getLayer(L_CLUSTER_COUNT)) {
+            map.addLayer({
+                id: L_CLUSTER_COUNT,
+                type: 'symbol',
+                source: SRC,
+                filter: ['has', 'point_count'],
+                layout: {
+                    'text-field': ['get', 'point_count_abbreviated'],
+                    'text-size': 13,
+                    'text-font': ['DIN Offc Pro Medium', 'Arial Unicode MS Bold'],
+                },
+                paint: { 'text-color': '#ffffff' },
+            });
+        }
+        if (!map.getLayer(L_POINT)) {
+            map.addLayer({
+                id: L_POINT,
+                type: 'circle',
+                source: SRC,
+                filter: ['!', ['has', 'point_count']],
+                paint: {
+                    'circle-color': ['get', 'color'],
+                    'circle-radius': 13,
+                    'circle-stroke-width': 2.5,
+                    'circle-stroke-color': '#ffffff',
+                },
+            });
+        }
+        if (!map.getLayer(L_SELECTED)) {
+            map.addLayer({
+                id: L_SELECTED,
+                type: 'circle',
+                source: SRC,
+                filter: ['==', ['get', 'id'], '__none__'],
+                paint: {
+                    'circle-radius': 18,
+                    'circle-color': 'rgba(0,0,0,0)',
+                    'circle-stroke-width': 3,
+                    'circle-stroke-color': isDark() ? '#b6c4ff' : '#00236f',
+                },
+            });
+        }
+        if (!map.getLayer(L_EMOJI)) {
+            map.addLayer({
+                id: L_EMOJI,
+                type: 'symbol',
+                source: SRC,
+                filter: ['!', ['has', 'point_count']],
+                layout: {
+                    'text-field': ['get', 'emoji'],
+                    'text-size': 14,
+                    'text-allow-overlap': true,
+                },
+            });
+        }
+
+        applyVisibility(map);
+        applySelected(map);
+    }
+
+    function applyVisibility(map: mapboxgl.Map) {
+        const pinVis = viewMode === 'pins' ? 'visible' : 'none';
+        const heatVis = viewMode === 'heat' ? 'visible' : 'none';
+        PIN_LAYERS.forEach(l => map.getLayer(l) && map.setLayoutProperty(l, 'visibility', pinVis));
+        if (map.getLayer(L_HEAT)) map.setLayoutProperty(L_HEAT, 'visibility', heatVis);
+    }
+
+    function applySelected(map: mapboxgl.Map) {
+        if (!map.getLayer(L_SELECTED)) return;
+        const id = selectedReportId ?? '__none__';
+        map.setFilter(L_SELECTED, ['==', ['get', 'id'], id]);
+    }
+
+    function attachHandlers(map: mapboxgl.Map) {
+        if (handlersRef.current) return;
+        handlersRef.current = true;
+
+        map.on('click', L_CLUSTER, (e) => {
+            const f = map.queryRenderedFeatures(e.point, { layers: [L_CLUSTER] })[0];
+            const clusterId = f?.properties?.cluster_id;
+            const src = map.getSource(SRC) as mapboxgl.GeoJSONSource;
+            src.getClusterExpansionZoom(clusterId, (err, zoom) => {
+                if (err) return;
+                map.easeTo({ center: (f.geometry as GeoJSON.Point).coordinates as [number, number], zoom: zoom ?? map.getZoom() + 2 });
+            });
+        });
+
+        const openPopup = (e: mapboxgl.MapLayerMouseEvent) => {
+            const f = e.features?.[0];
+            if (!f) return;
+            const props = f.properties ?? {};
+            popupRef.current?.remove();
+            popupRef.current = new mapboxgl.Popup({ offset: 16, maxWidth: '260px', className: 'zdanger-popup' })
+                .setLngLat((f.geometry as GeoJSON.Point).coordinates as [number, number])
+                .setHTML(popupHTML(props))
+                .addTo(map);
+            popupRef.current.on('close', () => onSelectRef.current?.(null));
+            onSelectRef.current?.(props.id);
+        };
+        map.on('click', L_POINT, openPopup);
+        map.on('click', L_EMOJI, openPopup);
+
+        [L_CLUSTER, L_POINT, L_EMOJI].forEach(l => {
+            map.on('mouseenter', l, () => { map.getCanvas().style.cursor = 'pointer'; });
+            map.on('mouseleave', l, () => { map.getCanvas().style.cursor = ''; });
+        });
+    }
+
+    /* ── init ── */
     useEffect(() => {
         if (!TOKEN || TOKEN === 'TU_TOKEN_AQUI' || !containerRef.current) return;
-
         mapboxgl.accessToken = TOKEN;
 
         const map = new mapboxgl.Map({
@@ -65,188 +278,66 @@ export function MapboxMap({
             center,
             zoom,
             attributionControl: false,
-            logoPosition: 'bottom-left',
         });
+        mapRef.current = map;
 
         map.addControl(new mapboxgl.NavigationControl({ showCompass: false }), 'top-right');
         map.addControl(new mapboxgl.AttributionControl({ compact: true }), 'bottom-right');
 
-        map.on('load', () => setReady(true));
-
-        mapRef.current = map;
-
-        /* sync dark/light style when the class changes */
-        const observer = new MutationObserver(() => {
-            map.setStyle(mapStyle());
+        // 'style.load' se dispara en la carga inicial Y tras cada setStyle (dark mode)
+        map.on('style.load', () => {
+            setupLayers(map);
+            attachHandlers(map);
+            setLoaded(true);
         });
-        observer.observe(document.documentElement, {
-            attributes: true,
-            attributeFilter: ['class'],
-        });
+
+        const observer = new MutationObserver(() => map.setStyle(mapStyle()));
+        observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
 
         return () => {
             observer.disconnect();
             map.remove();
             mapRef.current = null;
+            handlersRef.current = false;
         };
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
-    /* ── add / update markers when reports change ──────────── */
+    function fitToReports(map: mapboxgl.Map) {
+        const withCoords = reportsRef.current.filter(r => r.lat != null && r.lng != null);
+        if (withCoords.length === 0) return;
+        const lngs = withCoords.map(r => r.lng!);
+        const lats = withCoords.map(r => r.lat!);
+        map.fitBounds(
+            [[Math.min(...lngs) - 0.01, Math.min(...lats) - 0.01], [Math.max(...lngs) + 0.01, Math.max(...lats) + 0.01]],
+            { padding: 60, maxZoom: 15, duration: 700 },
+        );
+    }
+
+    /* ── datos / carga → actualizar fuentes + reencuadrar ── */
     useEffect(() => {
         const map = mapRef.current;
-        // Los markers son overlays del DOM (no dependen de que el estilo esté
-        // cargado), así que basta con tener la instancia del mapa.
-        if (!map) return;
+        if (!map || !loaded) return;
+        const fc = toFeatureCollection(reports);
+        (map.getSource(SRC) as mapboxgl.GeoJSONSource | undefined)?.setData(fc);
+        (map.getSource(SRC_HEAT) as mapboxgl.GeoJSONSource | undefined)?.setData(fc);
+        map.resize();
+        fitToReports(map);
+    }, [reports, loaded]);
 
-        /* remove markers that no longer exist */
-        Object.keys(markersRef.current).forEach(id => {
-            if (!reports.find(r => String(r.id) === id)) {
-                markersRef.current[id].remove();
-                delete markersRef.current[id];
-            }
-        });
-
-        /* auto-fit to all visible reports with coords */
-        const withCoords = reports.filter(r => r.lat != null && r.lng != null);
-        if (withCoords.length > 0) {
-            const lngs = withCoords.map(r => r.lng!);
-            const lats = withCoords.map(r => r.lat!);
-            const bounds: mapboxgl.LngLatBoundsLike = [
-                [Math.min(...lngs) - 0.01, Math.min(...lats) - 0.01],
-                [Math.max(...lngs) + 0.01, Math.max(...lats) + 0.01],
-            ];
-            map.fitBounds(bounds, { padding: 60, maxZoom: 15, duration: 800 });
-        }
-
-        reports.forEach(report => {
-            if (report.lat == null || report.lng == null) return;
-
-            if (markersRef.current[report.id]) {
-                /* update position only */
-                markersRef.current[report.id].setLngLat([report.lng, report.lat]);
-                return;
-            }
-
-            const color  = RISK_COLORS[report.risk];
-            const emoji  = TYPE_EMOJIS[report.type] ?? '📋';
-            const isHigh = report.risk === 'Alto';
-
-            /* ── custom marker element ── */
-            const el = document.createElement('div');
-            el.className = 'zdanger-pin';
-            el.style.cssText = `
-                position: relative;
-                cursor: pointer;
-                width: 40px;
-                height: 40px;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-            `;
-
-            /* pulse ring for high risk */
-            if (isHigh) {
-                const ring = document.createElement('span');
-                ring.style.cssText = `
-                    position: absolute;
-                    inset: 0;
-                    border-radius: 50%;
-                    background: ${color};
-                    opacity: 0.25;
-                    animation: zdanger-ping 1.4s cubic-bezier(0,0,0.2,1) infinite;
-                `;
-                el.appendChild(ring);
-            }
-
-            /* pin circle */
-            const pin = document.createElement('span');
-            pin.style.cssText = `
-                position: relative;
-                width: 32px;
-                height: 32px;
-                border-radius: 50%;
-                background: ${color};
-                border: 2.5px solid white;
-                box-shadow: 0 2px 8px rgba(0,0,0,0.25);
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                font-size: 15px;
-                transition: transform 0.15s;
-            `;
-            pin.textContent = emoji;
-            el.appendChild(pin);
-
-            el.addEventListener('mouseenter', () => { pin.style.transform = 'scale(1.15)'; });
-            el.addEventListener('mouseleave', () => { pin.style.transform = 'scale(1)'; });
-
-            /* ── popup ── */
-            const popup = new mapboxgl.Popup({
-                offset: 20,
-                closeButton: true,
-                maxWidth: '260px',
-                className: 'zdanger-popup',
-            }).setHTML(`
-                <div style="font-family: Inter, sans-serif; padding: 4px 2px;">
-                    <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
-                        <span style="font-size:20px">${emoji}</span>
-                        <div>
-                            <p style="margin:0; font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.06em; color:${color}">
-                                ${report.type}
-                            </p>
-                            <p style="margin:0; font-size:13px; font-weight:700; color: inherit;">
-                                ${report.title}
-                            </p>
-                        </div>
-                    </div>
-                    <p style="margin:0 0 4px; font-size:11px; opacity:0.7;">${report.location}</p>
-                    <p style="margin:0 0 8px; font-size:11px; opacity:0.6;">${report.time}</p>
-                    <div style="display:flex; justify-content:space-between; align-items:center; font-size:11px;">
-                        <span style="background:${color}22; color:${color}; border-radius:999px; padding:2px 8px; font-weight:700;">
-                            ${report.risk}
-                        </span>
-                        <span style="opacity:0.6;">Confianza: <b>${report.trustScore}/100</b></span>
-                    </div>
-                </div>
-            `);
-
-            el.addEventListener('click', () => {
-                /* close any open popup */
-                popupRef.current?.remove();
-                popup.addTo(mapRef.current!);
-                popupRef.current = popup;
-                onSelectReport?.(report.id);
-            });
-
-            popup.on('close', () => {
-                onSelectReport?.(null);
-            });
-
-            const marker = new mapboxgl.Marker({ element: el, anchor: 'center' })
-                .setLngLat([report.lng, report.lat])
-                .addTo(mapRef.current!);
-
-            markersRef.current[report.id] = marker;
-        });
-    }, [ready, reports, onSelectReport]);
-
-    /* ── highlight selected marker ─────────────────────────── */
+    /* ── cambia el modo de vista (pines / heatmap) ── */
     useEffect(() => {
-        const selected = selectedReportId == null ? null : String(selectedReportId);
-        Object.entries(markersRef.current).forEach(([id, marker]) => {
-            const pin = marker.getElement().querySelector('span:last-child') as HTMLElement | null;
-            if (!pin) return;
-            const isSelected = id === selected;
-            const risk = reports.find(r => String(r.id) === id)?.risk ?? 'Bajo';
-            pin.style.transform = isSelected ? 'scale(1.25)' : 'scale(1)';
-            pin.style.boxShadow = isSelected
-                ? `0 0 0 3px white, 0 0 0 5px ${RISK_COLORS[risk]}`
-                : '0 2px 8px rgba(0,0,0,0.25)';
-        });
-    }, [selectedReportId, reports]);
+        const map = mapRef.current;
+        if (map && loaded) applyVisibility(map);
+    }, [viewMode, loaded]);
 
-    /* ── no token fallback ─────────────────────────────────── */
+    /* ── cambia selección ── */
+    useEffect(() => {
+        const map = mapRef.current;
+        if (map && loaded) applySelected(map);
+    }, [selectedReportId, loaded]);
+
+    /* ── fallback sin token ── */
     if (!TOKEN || TOKEN === 'TU_TOKEN_AQUI') {
         return (
             <div className={`flex flex-col items-center justify-center rounded-2xl border border-dashed border-[var(--ac-outline-variant)] bg-[var(--ac-surface-container-low)] text-center ${className ?? 'min-h-[420px]'}`}>
@@ -264,21 +355,13 @@ export function MapboxMap({
 
     return (
         <>
-            {/* inject ping keyframe once */}
             <style>{`
-                @keyframes zdanger-ping {
-                    75%, 100% { transform: scale(2); opacity: 0; }
-                }
                 .zdanger-popup .mapboxgl-popup-content {
                     border-radius: 14px;
                     padding: 12px 14px;
                     box-shadow: 0 8px 24px rgba(0,0,0,0.14);
                 }
-                .mapboxgl-popup-close-button {
-                    font-size: 16px;
-                    color: #888;
-                    padding: 4px 8px;
-                }
+                .mapboxgl-popup-close-button { font-size: 16px; color: #888; padding: 4px 8px; }
             `}</style>
             <div
                 ref={containerRef}

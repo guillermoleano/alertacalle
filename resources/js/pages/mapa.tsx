@@ -1,11 +1,27 @@
 import { Head, Link } from '@inertiajs/react';
-import { Filter, PlusCircle, Search, SlidersHorizontal, X } from 'lucide-react';
+import { Filter, Flame, MapPin, PlusCircle, Search, SlidersHorizontal, X } from 'lucide-react';
 import { useState } from 'react';
 import { AppFrame } from '@/components/alertacalle/app-frame';
-import { MapboxMap } from '@/components/alertacalle/mapbox-map';
+import { MapboxMap, type MapViewMode } from '@/components/alertacalle/mapbox-map';
 import { ReportCard, type ReportSummary } from '@/components/alertacalle/report-card';
 import { incidentTypes } from '@/data/demo-reports';
 import { cn } from '@/lib/utils';
+
+type DateRange = 'todo' | '24h' | '7d' | '30d';
+
+const dateRanges: { value: DateRange; label: string }[] = [
+    { value: 'todo', label: 'Todo' },
+    { value: '24h', label: '24 h' },
+    { value: '7d',  label: '7 días' },
+    { value: '30d', label: '30 días' },
+];
+
+const rangeMs: Record<DateRange, number> = {
+    todo: Infinity,
+    '24h': 24 * 60 * 60 * 1000,
+    '7d':  7 * 24 * 60 * 60 * 1000,
+    '30d': 30 * 24 * 60 * 60 * 1000,
+};
 
 const stats = [
     { label: 'Reportes hoy',       value: '14',  color: 'text-red-500',                          bg: 'bg-red-500/10'                          },
@@ -19,15 +35,21 @@ export default function Mapa({ reports = [] }: { reports?: ReportSummary[] }) {
     const [showFilters,      setShowFilters]      = useState(false);
     const [search,           setSearch]           = useState('');
     const [selectedReportId, setSelectedReportId] = useState<string | number | null>(null);
+    const [viewMode,         setViewMode]         = useState<MapViewMode>('pins');
+    const [dateRange,        setDateRange]        = useState<DateRange>('todo');
 
     const allTypes = ['Todos', ...incidentTypes];
 
+    const now = Date.now();
     const filtered = reports.filter(r => {
         const matchType   = activeType === 'Todos' || r.type === activeType;
         const matchSearch = search === '' ||
             r.title.toLowerCase().includes(search.toLowerCase()) ||
             r.location.toLowerCase().includes(search.toLowerCase());
-        return matchType && matchSearch;
+        const when = r.occurredAt ?? r.createdAt;
+        const matchDate = dateRange === 'todo' || !when ||
+            (now - new Date(when).getTime()) <= rangeMs[dateRange];
+        return matchType && matchSearch && matchDate;
     });
 
     return (
@@ -116,10 +138,59 @@ export default function Mapa({ reports = [] }: { reports?: ReportSummary[] }) {
                         ))}
                     </div>
 
+                    {/* ── date range + view toggle ── */}
+                    <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+                        <div className="flex gap-1.5 rounded-xl bg-[var(--ac-surface-container)] p-1">
+                            {dateRanges.map(r => (
+                                <button
+                                    key={r.value}
+                                    type="button"
+                                    onClick={() => setDateRange(r.value)}
+                                    className={cn(
+                                        'min-h-8 rounded-lg px-3 text-[12px] font-bold transition-all active:scale-95',
+                                        dateRange === r.value
+                                            ? 'bg-[var(--ac-surface-container-lowest)] text-[var(--ac-primary)] shadow-sm'
+                                            : 'text-[var(--ac-on-surface-variant)] hover:text-[var(--ac-on-surface)]',
+                                    )}
+                                >
+                                    {r.label}
+                                </button>
+                            ))}
+                        </div>
+
+                        <div className="flex gap-1.5 rounded-xl bg-[var(--ac-surface-container)] p-1">
+                            <button
+                                type="button"
+                                onClick={() => setViewMode('pins')}
+                                className={cn(
+                                    'inline-flex min-h-8 items-center gap-1.5 rounded-lg px-3 text-[12px] font-bold transition-all active:scale-95',
+                                    viewMode === 'pins'
+                                        ? 'bg-[var(--ac-surface-container-lowest)] text-[var(--ac-primary)] shadow-sm'
+                                        : 'text-[var(--ac-on-surface-variant)] hover:text-[var(--ac-on-surface)]',
+                                )}
+                            >
+                                <MapPin className="size-3.5" /> Pines
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => setViewMode('heat')}
+                                className={cn(
+                                    'inline-flex min-h-8 items-center gap-1.5 rounded-lg px-3 text-[12px] font-bold transition-all active:scale-95',
+                                    viewMode === 'heat'
+                                        ? 'bg-[var(--ac-surface-container-lowest)] text-[var(--ac-primary)] shadow-sm'
+                                        : 'text-[var(--ac-on-surface-variant)] hover:text-[var(--ac-on-surface)]',
+                                )}
+                            >
+                                <Flame className="size-3.5" /> Calor
+                            </button>
+                        </div>
+                    </div>
+
                     {/* ── Mapbox ── */}
                     <MapboxMap
                         reports={filtered}
                         className="min-h-[440px] w-full"
+                        viewMode={viewMode}
                         onSelectReport={setSelectedReportId}
                         selectedReportId={selectedReportId}
                     />

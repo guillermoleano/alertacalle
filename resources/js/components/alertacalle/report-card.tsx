@@ -16,6 +16,8 @@ export type ReportSummary = {
     denies: number;
     lat?: number;
     lng?: number;
+    createdAt?: string;
+    occurredAt?: string;
 };
 
 const riskConfig = {
