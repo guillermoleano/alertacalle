@@ -17,24 +17,32 @@
 5. Estética **calmada, no alarmista**: mapa desaturado, rojo solo para riesgo alto.
 ---
  
-## 1. Stack (Laravel) — SUSTITUYE al de la v2
- 
-- **Backend:** Laravel 13 (PHP 8.4). Blade para vistas (las de Stitch, limpiadas).
-- **Base de datos:** **PostgreSQL 15 + PostGIS**. Paquete espacial: `clickbar/laravel-magellan` o `matanyadaev/laravel-eloquent-spatial` para tipos `Point`/consultas por distancia. (Fallback aceptable: MySQL 8 con tipos espaciales y `ST_Distance_Sphere`, pero se prefiere PostGIS.)
-- **Frontend/interactividad:** Blade + **Alpine.js** + **Vite** + **Tailwind** (tema cargado desde tokens de DESIGN.md). Componentes reactivos puntuales (votos, filtros) con **Livewire** *o* con `fetch` a endpoints JSON; elegir Livewire si se quiere menos JS manual.
-- **Mapa:** **Mapbox GL JS** (capa heatmap + clustering), estilo **desaturado**. Fallback: Leaflet + OpenStreetMap.
-- **Auth:** Laravel Breeze/Fortify. **Anónimo permitido**; verificación de teléfono (OTP) **opcional** para reputación (fase 1.5 si complica el MVP).
-- **Tiempo real:** opcional. MVP puede **hacer polling cada 30 s**. Si se quiere push: **Laravel Reverb + Echo**.
-- **PWA / offline:** **fase 2**. En el MVP basta web responsive servida por Blade. (La cola offline de la v2 NO aplica al MVP en Laravel.)
-- **Colas:** Laravel Queue para tareas async (recalcular trust en lote, archivado por decaimiento via Scheduler).
-**Estructura Laravel:**
+## 1. Stack (Laravel) — estado real implementado
+
+> Esta sección documenta el stack **realmente construido**, que difiere del plan
+> original (Blade + Alpine + Livewire + PostGIS). La fuente de verdad técnica
+> completa es `zdanger-spec.md`.
+
+- **Backend:** Laravel 13 (PHP 8.4).
+- **SPA bridge:** **Inertia.js v3** — sin API REST separada; cada página recibe props del controlador.
+- **Frontend:** **React 19 + TypeScript + Vite** + **Tailwind v4** (tokens `--ac-*`, dark mode automático). Las páginas viven en `resources/js/pages/*.tsx`.
+- **Base de datos:** **SQLite** en dev → **PostgreSQL + PostGIS** previsto para prod. Por ahora las consultas por distancia (zonas de alerta) se resuelven con **Haversine en PHP**, no con tipos espaciales.
+- **Mapa:** **Mapbox GL JS** (pines + popups; heatmap/clustering en backlog), con sync de estilo claro/oscuro. Geocoding vía Mapbox Geocoding API (`resources/js/lib/mapbox-geocode.ts`).
+- **Auth:** **Laravel Fortify** (+ passkeys / 2FA). Esquema **mixto**: lectura pública, escritura requiere sesión. **Anónimo permitido** en reportes.
+- **Tiempo real:** notificaciones in-app **derivadas on-the-fly** (sin tabla), compartidas por props de Inertia. Push (FCM) y polling quedan para fase 2.
+- **PWA / offline:** **fase 2**.
+- **Colas:** Laravel Queue previsto para tareas async (recalcular trust en lote, archivado por decaimiento).
+
+**Estructura real (resumen):**
 ```
-app/Models/{Report.php, Validation.php, Profile.php}
-app/Http/Controllers/{MapController, ReportController, VoteController, ProfileController}
-app/Services/TrustScoreService.php
-database/migrations/*  database/seeders/AlertaCalleSeeder.php
-resources/views/*  (vistas Stitch limpiadas — ver §5)
-resources/js/{map.js, alpine setup}  resources/css/app.css (tokens)
+app/Models/{Report, ReportVote, ReportMedia, AlertZone, User}.php
+app/Http/Controllers/{ReportController, AlertZoneController, NotificationController}.php
+app/Http/Middleware/HandleInertiaRequests.php  (comparte auth + notifications)
+app/Support/UserAlerts.php  (feed de notificaciones derivado)
+database/migrations/*  database/seeders/{ReportSeeder, DatabaseSeeder}.php
+resources/js/pages/*.tsx        (mapa, reportes, reportar, ajustes, mi-perfil)
+resources/js/components/alertacalle/*.tsx
+resources/js/lib/mapbox-geocode.ts   resources/css/app.css (tokens --ac-*)
 routes/web.php
 ```
  
