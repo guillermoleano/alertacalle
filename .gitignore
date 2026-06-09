@@ -33,3 +33,6 @@ yarn-error.log
 /.agents
 /.codex
 /AGENTS.md
+
+# Documento personal local (no versionado)
+/IgnorePersonalDocu.md
