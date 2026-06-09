@@ -153,8 +153,11 @@ type (enum: mugging, vehicle_theft, phone_theft, pickpocket,
            motorcycle_robbery, bank_followup, intimidation, other)
 title (string)
 description (text)
+note (string 200, nullable) — nota adicional opcional del reportante
 status (enum: pending, validated, rejected, fake)
-risk_level (enum: Alto, Medio, Bajo)
+risk_level (enum: Alto, Medio, Bajo) — derivado de votos (trust_score)
+severity (Alta/Media/Baja) — derivada del tipo en código (Report::severityForType),
+          no es columna; se serializa en toInertia()
 latitude (decimal 10,7)
 longitude (decimal 10,7)
 address (string)
@@ -312,7 +315,7 @@ Route::middleware(['auth'])->group(function () {
 
 ```env
 APP_NAME=ZDanger
-APP_URL=http://zdanger.test
+APP_URL=https://zdanger.test   # HTTPS (herd secure) — requerido por geolocalización
 
 DB_CONNECTION=sqlite          # dev
 # DB_CONNECTION=pgsql         # prod (con PostGIS para queries geoespaciales)
@@ -441,6 +444,25 @@ VITE_MAPBOX_TOKEN=pk.eyJ1...  # Mapbox public token
   (frente #1) y portado a **`/reportes`** (frente #2). Client-side sobre
   `occurredAt ?? createdAt`, integrado al reset de "Limpiar filtros".
   Con esto el Hito 4 queda cerrado por completo.
+
+### ✅ Mejoras de reporte y ubicación
+- **Mapa interactivo de ubicación** (`LocationPickerMap`): reemplaza la grilla
+  SVG falsa del wizard. Pin arrastrable + click para marcar; sincronizado con
+  "mi ubicación" y con el geocoding de la dirección (mueve y recentra el pin)
+- **Autodetección de ubicación al abrir** el wizard (una vez). Requiere
+  **contexto seguro**: el sitio se sirve por **HTTPS** (`herd secure` +
+  `APP_URL=https://zdanger.test`), obligatorio para `navigator.geolocation`
+- **Severidad por tipo de incidente** (`Report::severityForType`, Alta/Media/Baja):
+  filtro de severidad en `/mapa` y `/reportes` + indicador en `ReportCard`.
+  Distinta del `risk_level` (que se deriva de los votos)
+- **Fecha del hecho no futura**: validación `before_or_equal:now` en backend +
+  `max` en el `datetime-local`. (De paso fix de un 500 latente en `store()`
+  cuando faltaba `title`.)
+- **Nota libre opcional** (`reports.note`, máx 200): campo en el wizard +
+  callout en `ReportCard`
+- **Tests** sumados: `ReportSeverityTest` (mapeo + serialización) y casos nuevos
+  en `ReportSubmissionTest` (fecha futura/pasada, nota y su límite).
+  Suite: **70 ✓ / 281 assertions**
 
 ### 📋 Próximo — Fase 2
 - Alertas push por zona (FCM)
