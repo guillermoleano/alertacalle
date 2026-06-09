@@ -14,11 +14,11 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/reportar', [ReportController::class, 'create'])->name('reportar');
     Route::post('/reportar', [ReportController::class, 'store'])->name('reportar.store');
     Route::post('/reportes/{report}/vote', [ReportController::class, 'vote'])->name('reportes.vote');
-});
 
-/* ── Páginas de cuenta ── */
-Route::inertia('/mi-perfil', 'mi-perfil')->name('mi-perfil');
-Route::inertia('/ajustes', 'ajustes')->name('ajustes');
+    /* ── Páginas de cuenta ── */
+    Route::get('/mi-perfil', [ReportController::class, 'profile'])->name('mi-perfil');
+    Route::inertia('/ajustes', 'ajustes')->name('ajustes');
+});
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::inertia('dashboard', 'dashboard')->name('dashboard');

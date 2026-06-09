@@ -1,4 +1,4 @@
-import { Head } from '@inertiajs/react';
+import { Head, router, usePage } from '@inertiajs/react';
 import { useStagger } from '@/hooks/use-stagger';
 import {
     Bell,
@@ -15,7 +15,6 @@ import {
     MapPin,
     Moon,
     Palette,
-    Phone,
     Settings,
     Shield,
     Smartphone,
@@ -226,30 +225,6 @@ function Chips({
     );
 }
 
-function Badge({
-    label,
-    variant = 'warning',
-}: {
-    label: string;
-    variant?: 'warning' | 'success' | 'error';
-}) {
-    const cls = {
-        warning: 'bg-amber-100 text-amber-800',
-        success: 'bg-[var(--ac-secondary-fixed)] text-[var(--ac-secondary)]',
-        error: 'bg-red-100 text-red-700',
-    }[variant];
-    return (
-        <span
-            className={cn(
-                'inline-block rounded-full px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wide',
-                cls,
-            )}
-        >
-            {label}
-        </span>
-    );
-}
-
 /* ─── Delete modal ──────────────────────────────────────────── */
 function DeleteModal({ onClose }: { onClose: () => void }) {
     return (
@@ -345,7 +320,11 @@ function ZoneRow({
 }
 
 /* ─── Main page ──────────────────────────────────────────────── */
+type AuthUser = { name: string; email: string } | null;
+
 export default function Ajustes() {
+    const user = usePage<{ auth: { user: AuthUser } }>().props.auth.user;
+
     /* notifications */
     const [notifCercanas, setNotifCercanas] = useState(true);
     const [notifValidaciones, setNotifValidaciones] = useState(true);
@@ -401,27 +380,20 @@ export default function Ajustes() {
                             <SettingRow
                                 icon={User}
                                 label="Nombre completo"
-                                sub="Carlos Mendoza"
-                                onClick={() => {}}
+                                sub={user?.name ?? 'Sin definir'}
+                                onClick={() => router.visit('/settings/profile')}
                             />
                             <SettingRow
                                 icon={Mail}
                                 label="Correo electrónico"
-                                sub="carlos@ejemplo.com"
-                                onClick={() => {}}
-                            />
-                            <SettingRow
-                                icon={Phone}
-                                label="Teléfono"
-                                sub="Verificar número →"
-                                right={<Badge label="Pendiente" variant="warning" />}
-                                onClick={() => {}}
+                                sub={user?.email ?? 'Sin definir'}
+                                onClick={() => router.visit('/settings/profile')}
                             />
                             <SettingRow
                                 icon={KeyRound}
                                 label="Contraseña"
-                                sub="Último cambio hace 30 días"
-                                onClick={() => {}}
+                                sub="Cambiar contraseña"
+                                onClick={() => router.visit('/settings/security')}
                             />
                         </div>
                     </div>

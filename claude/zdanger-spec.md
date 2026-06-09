@@ -386,10 +386,21 @@ VITE_MAPBOX_TOKEN=pk.eyJ1...  # Mapbox public token
 - Fix de infra: habilitado `RefreshDatabase` global en `tests/Pest.php`
   (estaba comentado → 30 tests de auth/settings fallaban). Suite: 43 ✓
 
-### 🔄 Pendiente — Hito 3 (identidad)
-- Personalizar login/registro con identidad ZDanger
-- Mi Perfil real (reportes propios, reputación)
-- Formulario de Cuenta funcional en Ajustes
+### ✅ Hito 3 — Identidad
+- **Auth branding**: layout `auth-simple-layout.tsx` con identidad ZDanger
+  (ShieldCheck + tagline, card elevada, glows de marca, tokens `--ac-*`)
+- **Mi Perfil real** (`ReportController@profile`, ruta con auth): nombre,
+  email, "miembro desde", reputación calculada (0–1000), stats (reportes /
+  validados / confirmaciones), reportes propios con empty state
+- **Cuenta en Ajustes**: muestra nombre/email reales (vía `auth.user`
+  compartido) y enrutan a `/settings/profile` y `/settings/security`
+- **Tests** (`tests/Feature/ProfilePageTest.php`): auth requerido +
+  stats/reputación calculadas correctamente. Suite: 45 ✓ / 176 assertions
+
+### 📋 Próximo — Hito 4 (crecimiento)
+- Clustering de pines + heatmap en el mapa
+- Filtro por fecha en mapa/reportes
+- Zonas de alerta funcionales + notificaciones in-app
 
 ### 📋 Fase 2
 - Alertas push por zona (FCM)

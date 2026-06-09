@@ -57,6 +57,35 @@ class ReportController extends Controller
         return Inertia::render('reportar');
     }
 
+    /** GET /mi-perfil — perfil del usuario con sus reportes y reputación */
+    public function profile(Request $request): Response
+    {
+        $user = $request->user();
+
+        $reports = Report::where('user_id', $user->id)->latest()->get();
+
+        $stats = [
+            'total' => $reports->count(),
+            'validated' => $reports->where('status', 'validated')->count(),
+            'confirms' => (int) $reports->sum('confirms_count'),
+            'avgTrust' => (int) round($reports->avg('trust_score') ?? 0),
+        ];
+
+        // Reputación 0–1000: pondera reportes validados y confirmaciones recibidas
+        $reputation = min(1000, $stats['validated'] * 150 + $stats['confirms'] * 10);
+
+        return Inertia::render('mi-perfil', [
+            'profileUser' => [
+                'name' => $user->name,
+                'email' => $user->email,
+                'memberSince' => $user->created_at->locale('es')->isoFormat('MMMM [de] YYYY'),
+            ],
+            'reports' => $reports->map(fn (Report $r) => $r->toInertia()),
+            'stats' => $stats,
+            'reputation' => $reputation,
+        ]);
+    }
+
     /** POST /reportar — guardar reporte */
     public function store(Request $request): RedirectResponse
     {
