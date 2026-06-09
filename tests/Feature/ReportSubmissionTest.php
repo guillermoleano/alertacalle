@@ -69,3 +69,27 @@ test('media must respect type and size limits', function () {
 
     expect(Report::count())->toBe(0);
 });
+
+test('report submission rejects a future occurrence date', function () {
+    $this->actingAs(User::factory()->create());
+
+    $this->post(route('reportar.store'), [
+        'type' => 'Hurto celular',
+        'address' => 'Calle 100',
+        'occurred_at' => now()->addDay()->toDateTimeString(),
+    ])->assertSessionHasErrors('occurred_at');
+
+    expect(Report::count())->toBe(0);
+});
+
+test('report submission accepts a past occurrence date', function () {
+    $this->actingAs(User::factory()->create());
+
+    $this->post(route('reportar.store'), [
+        'type' => 'Hurto celular',
+        'address' => 'Calle 100',
+        'occurred_at' => now()->subHours(3)->toDateTimeString(),
+    ])->assertRedirect(route('reportes'));
+
+    expect(Report::count())->toBe(1);
+});

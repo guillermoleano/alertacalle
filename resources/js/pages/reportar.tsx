@@ -30,6 +30,13 @@ const steps = [
 
 type Coords = { lat: number; lng: number } | null;
 
+/** Fecha/hora local en el formato que espera <input type="datetime-local">. */
+function localDateTimeValue(d: Date): string {
+    const pad = (n: number) => String(n).padStart(2, '0');
+
+    return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
+
 export default function Reportar() {
     const [step, setStep] = useState<Step>(1);
     const [incType, setIncType] = useState(incidentTypes[0]);
@@ -87,8 +94,8 @@ export default function Reportar() {
             setLocation(r.placeName.split(',')[0] ?? r.placeName);
 
             if (r.neighborhood) {
-setBarrio(r.neighborhood);
-}
+                setBarrio(r.neighborhood);
+            }
         }
     }
 
@@ -97,6 +104,10 @@ setBarrio(r.neighborhood);
         setGeoStatus('located');
         void applyCoords(c);
     }
+
+    /* ── Tope de fecha (no se permite fecha futura del hecho) ── */
+     
+    const [maxDateTime] = useState(() => localDateTimeValue(new Date()));
 
     /* ── Autodetección al abrir el wizard (una vez) ── */
     const autoLocated = useRef(false);
@@ -125,8 +136,8 @@ setBarrio(r.neighborhood);
     async function submit() {
         if (!canSubmit || processing) {
             if (!canSubmit) {
-setStep(1);
-} // falta la ubicación
+                setStep(1);
+            } // falta la ubicación
 
             return;
         }
@@ -354,11 +365,22 @@ setStep(1);
                                         <input
                                             type="datetime-local"
                                             value={datetime}
+                                            max={maxDateTime}
                                             onChange={(e) =>
                                                 setDatetime(e.target.value)
                                             }
-                                            className="min-h-11 rounded-xl border border-[var(--ac-outline-variant)] bg-white px-4 text-sm outline-none focus:ring-2 focus:ring-[var(--ac-primary)]"
+                                            className={cn(
+                                                'min-h-11 rounded-xl border bg-white px-4 text-sm outline-none focus:ring-2 focus:ring-[var(--ac-primary)]',
+                                                errors.occurred_at
+                                                    ? 'border-red-400'
+                                                    : 'border-[var(--ac-outline-variant)]',
+                                            )}
                                         />
+                                        {errors.occurred_at && (
+                                            <span className="text-[11px] font-medium text-red-500">
+                                                {errors.occurred_at}
+                                            </span>
+                                        )}
                                     </label>
                                 </div>
                             </div>

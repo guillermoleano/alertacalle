@@ -98,16 +98,18 @@ class ReportController extends Controller
             'city' => 'nullable|string|max:100',
             'latitude' => 'nullable|numeric|between:-90,90',
             'longitude' => 'nullable|numeric|between:-180,180',
-            'occurred_at' => 'nullable|date',
+            'occurred_at' => 'nullable|date|before_or_equal:now',
             'anonymous' => 'boolean',
             'media' => 'nullable|array|max:3',
             'media.*' => 'file|mimes:jpg,jpeg,png,mp4|max:10240', // 10 MB
+        ], [
+            'occurred_at.before_or_equal' => 'La fecha del hecho no puede ser futura.',
         ]);
 
         $data = collect($validated)->except('media')->all();
 
-        // Si no viene title calculamos uno del tipo
-        $data['title'] = $data['title'] ?: $data['type'];
+        // Si no viene title (o llega vacío) lo derivamos del tipo
+        $data['title'] = ($data['title'] ?? null) ?: $data['type'];
         $data['user_id'] = auth()->id();
         $data['anonymous'] = $data['anonymous'] ?? true;
         $data['status'] = 'pending';
