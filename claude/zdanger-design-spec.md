@@ -19,7 +19,7 @@
  
 ## 1. Stack (Laravel) — SUSTITUYE al de la v2
  
-- **Backend:** Laravel 11 (PHP 8.3). Blade para vistas (las de Stitch, limpiadas).
+- **Backend:** Laravel 13 (PHP 8.4). Blade para vistas (las de Stitch, limpiadas).
 - **Base de datos:** **PostgreSQL 15 + PostGIS**. Paquete espacial: `clickbar/laravel-magellan` o `matanyadaev/laravel-eloquent-spatial` para tipos `Point`/consultas por distancia. (Fallback aceptable: MySQL 8 con tipos espaciales y `ST_Distance_Sphere`, pero se prefiere PostGIS.)
 - **Frontend/interactividad:** Blade + **Alpine.js** + **Vite** + **Tailwind** (tema cargado desde tokens de DESIGN.md). Componentes reactivos puntuales (votos, filtros) con **Livewire** *o* con `fetch` a endpoints JSON; elegir Livewire si se quiere menos JS manual.
 - **Mapa:** **Mapbox GL JS** (capa heatmap + clustering), estilo **desaturado**. Fallback: Leaflet + OpenStreetMap.
