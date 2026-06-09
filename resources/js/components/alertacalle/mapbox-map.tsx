@@ -67,22 +67,32 @@ function toFeatureCollection(reports: ReportSummary[]): GeoJSON.FeatureCollectio
     };
 }
 
+/** Escapa texto para interpolar de forma segura en el HTML del popup (anti-XSS). */
+function esc(value: unknown): string {
+    return String(value ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+}
+
 function popupHTML(p: Record<string, unknown>): string {
-    const color = String(p.color);
+    const color = esc(p.color);
     return `
         <div style="font-family: Inter, sans-serif; padding: 4px 2px;">
             <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
-                <span style="font-size:20px">${p.emoji}</span>
+                <span style="font-size:20px">${esc(p.emoji)}</span>
                 <div>
-                    <p style="margin:0; font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.06em; color:${color}">${p.type}</p>
-                    <p style="margin:0; font-size:13px; font-weight:700; color:inherit;">${p.title}</p>
+                    <p style="margin:0; font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.06em; color:${color}">${esc(p.type)}</p>
+                    <p style="margin:0; font-size:13px; font-weight:700; color:inherit;">${esc(p.title)}</p>
                 </div>
             </div>
-            <p style="margin:0 0 4px; font-size:11px; opacity:0.7;">${p.location}</p>
-            <p style="margin:0 0 8px; font-size:11px; opacity:0.6;">${p.time}</p>
+            <p style="margin:0 0 4px; font-size:11px; opacity:0.7;">${esc(p.location)}</p>
+            <p style="margin:0 0 8px; font-size:11px; opacity:0.6;">${esc(p.time)}</p>
             <div style="display:flex; justify-content:space-between; align-items:center; font-size:11px;">
-                <span style="background:${color}22; color:${color}; border-radius:999px; padding:2px 8px; font-weight:700;">${p.risk}</span>
-                <span style="opacity:0.6;">Confianza: <b>${p.trust}/100</b></span>
+                <span style="background:${color}22; color:${color}; border-radius:999px; padding:2px 8px; font-weight:700;">${esc(p.risk)}</span>
+                <span style="opacity:0.6;">Confianza: <b>${esc(p.trust)}/100</b></span>
             </div>
         </div>`;
 }

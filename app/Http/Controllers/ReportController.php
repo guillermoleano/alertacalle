@@ -109,6 +109,13 @@ class ReportController extends Controller
 
         $data = collect($validated)->except('media')->all();
 
+        // Sanitización: los campos de texto son plano, sin HTML (defensa anti-XSS)
+        foreach (['type', 'title', 'description', 'note', 'address', 'neighborhood', 'city'] as $field) {
+            if (isset($data[$field])) {
+                $data[$field] = trim(strip_tags((string) $data[$field]));
+            }
+        }
+
         // Si no viene title (o llega vacío) lo derivamos del tipo
         $data['title'] = ($data['title'] ?? null) ?: $data['type'];
         $data['user_id'] = auth()->id();

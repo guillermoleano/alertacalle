@@ -119,6 +119,24 @@ test('report note cannot exceed 200 characters', function () {
     expect(Report::count())->toBe(0);
 });
 
+test('report text fields are sanitized of html tags', function () {
+    $this->actingAs(User::factory()->create());
+
+    $this->post(route('reportar.store'), [
+        'type' => 'Hurto celular',
+        'title' => '<script>alert(1)</script>Robo',
+        'description' => 'Ojo <img src=x onerror=alert(1)> acá',
+        'note' => '<b>nota</b>',
+        'address' => 'Calle <i>100</i>',
+    ])->assertRedirect(route('reportes'));
+
+    $report = Report::firstOrFail();
+    expect($report->title)->toBe('alert(1)Robo')
+        ->and($report->description)->toBe('Ojo  acá')
+        ->and($report->note)->toBe('nota')
+        ->and($report->address)->toBe('Calle 100');
+});
+
 test('report submission is rate limited to 5 per hour', function () {
     $this->actingAs(User::factory()->create());
 
