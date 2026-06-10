@@ -3,6 +3,7 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Enums\UserRole;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
@@ -33,7 +34,14 @@ class User extends Authenticatable implements PasskeyUser
             'password' => 'hashed',
             'two_factor_confirmed_at' => 'datetime',
             'alerts_seen_at' => 'datetime',
+            'role' => UserRole::class,
         ];
+    }
+
+    /** ¿El usuario puede moderar reportes (moderador o autoridad)? */
+    public function canModerate(): bool
+    {
+        return ($this->role ?? UserRole::Citizen)->canModerate();
     }
 
     /**

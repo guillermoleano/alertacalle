@@ -43,6 +43,7 @@ class HandleInertiaRequests extends Middleware
             'name' => config('app.name'),
             'auth' => [
                 'user' => $user,
+                'canModerate' => (bool) $user?->canModerate(),
             ],
             'notifications' => $user
                 ? UserAlerts::for($user)->toArray()

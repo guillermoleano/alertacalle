@@ -10,12 +10,13 @@ import {
     Moon,
     PlusCircle,
     Settings,
+    ShieldAlert,
     ShieldCheck,
     Sun,
     UserRound,
 } from 'lucide-react';
-import { useEffect, useRef, useState  } from 'react';
-import type {PropsWithChildren} from 'react';
+import { useEffect, useRef, useState } from 'react';
+import type { PropsWithChildren } from 'react';
 import { useAppearance } from '@/hooks/use-appearance';
 import { cn } from '@/lib/utils';
 
@@ -34,7 +35,7 @@ type NotificationsProp = {
     items: NotificationItem[];
 };
 
-const navItems = [
+const baseNavItems = [
     { label: 'Mapa', href: '/mapa', icon: Map },
     { label: 'Reportar', href: '/reportar', icon: PlusCircle },
     { label: 'Reportes', href: '/reportes', icon: ClipboardList },
@@ -107,8 +108,8 @@ function NotificationBell() {
     // cerrar al hacer click afuera o con Escape
     useEffect(() => {
         if (!open) {
-return;
-}
+            return;
+        }
 
         function onPointer(e: MouseEvent) {
             if (ref.current && !ref.current.contains(e.target as Node)) {
@@ -117,8 +118,8 @@ return;
         }
         function onKey(e: KeyboardEvent) {
             if (e.key === 'Escape') {
-setOpen(false);
-}
+                setOpen(false);
+            }
         }
 
         document.addEventListener('mousedown', onPointer);
@@ -244,7 +245,14 @@ setOpen(false);
 }
 
 export function AppFrame({ children }: PropsWithChildren) {
-    const { url } = usePage();
+    const page = usePage<{ auth: { canModerate?: boolean } }>();
+    const { url } = page;
+    const navItems = page.props.auth?.canModerate
+        ? [
+              ...baseNavItems,
+              { label: 'Moderación', href: '/moderacion', icon: ShieldAlert },
+          ]
+        : baseNavItems;
 
     return (
         <div className="min-h-screen bg-[var(--ac-background)] text-[var(--ac-on-surface)] transition-colors duration-300">

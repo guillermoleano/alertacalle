@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -79,11 +80,30 @@ class Report extends Model
         return self::SEVERITY_BY_TYPE[$type] ?? 'Media';
     }
 
+    /* ── estados ── */
+
+    /** Estados ocultos del mapa/listado público. */
+    public const HIDDEN_STATUSES = ['rejected', 'fake'];
+
+    /** Estados que un moderador puede asignar manualmente. */
+    public const MODERATABLE_STATUSES = ['pending', 'validated', 'rejected', 'fake'];
+
+    /**
+     * Limita la query a reportes visibles públicamente (no rechazados ni fake).
+     *
+     * @param  Builder<Report>  $query
+     */
+    public function scopeVisible($query): void
+    {
+        $query->whereNotIn('status', self::HIDDEN_STATUSES);
+    }
+
     /* ── helpers ── */
 
     /**
-     * Recalcula trust_score y risk_level en base a votos.
-     * trust_score = confirms / (confirms + denies) * 100
+     * Recalcula trust_score y risk_level en base a votos. Auto-transiciona el
+     * estado mientras siga `pending`: 5 confirmaciones → validated;
+     * 3 negativas → fake. Si un moderador ya fijó un estado, no se toca.
      */
     public function recalculateTrust(): void
     {
@@ -96,10 +116,19 @@ class Report extends Model
             default => 'Bajo',
         };
 
+        $status = $this->status;
+        if ($status === 'pending') {
+            $status = match (true) {
+                $this->denies_count >= 3 => 'fake',
+                $this->confirms_count >= 5 => 'validated',
+                default => 'pending',
+            };
+        }
+
         $this->update([
             'trust_score' => $score,
             'risk_level' => $risk,
-            'status' => $this->confirms_count >= 5 ? 'validated' : $this->status,
+            'status' => $status,
         ]);
     }
 

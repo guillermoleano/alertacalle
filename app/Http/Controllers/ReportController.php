@@ -14,7 +14,7 @@ class ReportController extends Controller
     /** GET /mapa — página con reportes para el mapa */
     public function mapa(): Response
     {
-        $reports = Report::where('status', '!=', 'rejected')
+        $reports = Report::visible()
             ->latest()
             ->take(50)
             ->get()
@@ -28,7 +28,7 @@ class ReportController extends Controller
     /** GET /reportes — listado completo con filtros */
     public function index(Request $request): Response
     {
-        $query = Report::where('status', '!=', 'rejected')->latest();
+        $query = Report::visible()->latest();
 
         if ($request->filled('type') && $request->type !== 'Todos') {
             $query->where('type', $request->type);

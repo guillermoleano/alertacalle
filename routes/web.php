@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AlertZoneController;
+use App\Http\Controllers\ModerationController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\ReportController;
 use Illuminate\Support\Facades\Route;
@@ -32,6 +33,12 @@ Route::middleware(['auth'])->group(function () {
 
     /* ── Notificaciones ── */
     Route::post('/notificaciones/visto', [NotificationController::class, 'seen'])->name('notificaciones.visto');
+
+    /* ── Moderación (moderadores / autoridades) ── */
+    Route::middleware('can:moderate')->group(function () {
+        Route::get('/moderacion', [ModerationController::class, 'index'])->name('moderacion');
+        Route::patch('/moderacion/{report}', [ModerationController::class, 'update'])->name('moderacion.update');
+    });
 });
 
 Route::middleware(['auth', 'verified'])->group(function () {
