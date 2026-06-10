@@ -470,19 +470,23 @@ VITE_MAPBOX_TOKEN=pk.eyJ1...  # Mapbox public token
 
 ## Roadmap por sprints
 
-### 🏁 Sprint 0 — Consolidación & datos demo (en curso)
-- Seeder de demo (dev): zonas para un usuario + reportes ajenos dentro + votos
-  cruzados → campana y validaciones pobladas.
+### ✅ Sprint 0 — Consolidación & datos demo
+- `DemoSocialSeeder` (dev): zonas + reportes en zona + votos cruzados → campana
+  y validaciones pobladas. (`php artisan db:seed --class=DemoSocialSeeder`)
 - Rate limiting en `POST /reportar` (5/h) y `/vote` (10/h).
-- Sanitización de texto (title/description/note) contra XSS.
-- Limpieza de código muerto (`demo-reports.ts` legacy, `calm-map-preview.tsx`).
-- PR + merge de `02-backend-connection-and-boost` a la rama base.
+- Sanitización anti-XSS: `strip_tags` backend + escape del popup del mapa.
+- Limpieza de código muerto (`demoReports`, `CalmMapPreview`).
+- Pendiente: PR + merge de `02-backend-connection-and-boost` (queda a criterio).
 
-### 🛡️ Sprint 1 — Roles & Moderación
-- `role` enum en `users` (citizen/moderator/authority) + Policy/middleware.
-- Panel de moderación: listar pending/denunciados, cambiar `status`
-  (validar/rechazar/fake), ver votos.
-- Auto-transiciones: 5 confirmaciones → `validated`; 3 negativas → `fake`.
+### ✅ Sprint 1 — Roles & Moderación
+- `UserRole` (citizen/moderator/authority) en `users.role`, `canModerate()` +
+  Gate `moderate`. Nav condicional vía `auth.canModerate`.
+- Panel `/moderacion` (`can:moderate`): lista con estado/votos + acciones
+  validar/rechazar/fake/pendiente.
+- `status` enum → string (admite `fake`); scope `visible()` oculta
+  rejected+fake del público.
+- Auto-transiciones (mientras `pending`): 5 confirmaciones → `validated`;
+  3 negativas → `fake`. Suite: **79 ✓ / 329 assertions**.
 
 ### 🔔 Sprint 2 — Notificaciones reales + push
 - Tabla de notificaciones persistida + eventos/listeners.
